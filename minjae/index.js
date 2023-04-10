@@ -2,6 +2,7 @@
 const express = require('express');
 const app = express();
 
+// DB connection with pg(using postgresql)
 const { Client } = require("pg");
 const client = new Client({
   user: "vraptor",
