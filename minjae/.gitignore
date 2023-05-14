@@ -1,8 +1,36 @@
+Skip to content
+Search or jump to…
+Pull requests
+Issues
+Codespaces
+Marketplace
+Explore
+ 
+@KMJAE-Vincent-Dev 
+SW-Engineering-Team1
+/
+agricola_backend
+Private
+Cannot fork because forking is disabled.
+Code
+Issues
+Pull requests
+Actions
+Projects
+Security
+Insights
+Settings
+agricola_backend/.gitignore
+@BaeGayeon
+BaeGayeon chore: Add gitignore
+Latest commit 16d83d4 48 minutes ago
+ History
+ 1 contributor
+335 lines (254 sloc)  5.99 KB
+ 
+
 # Created by https://www.toptal.com/developers/gitignore/api/node,macos,windows,visualstudiocode,webstorm
 # Edit at https://www.toptal.com/developers/gitignore?templates=node,macos,windows,visualstudiocode,webstorm
-
-### IntelliJ ###
-.idea/
 
 ### macOS ###
 # General
@@ -336,3 +364,18 @@ $RECYCLE.BIN/
 *.lnk
 
 # End of https://www.toptal.com/developers/gitignore/api/node,macos,windows,visualstudiocode,webstorm
+Footer
+© 2023 GitHub, Inc.
+Footer navigation
+Terms
+Privacy
+Security
+Status
+Docs
+Contact GitHub
+Pricing
+API
+Training
+Blog
+About
+agricola_backend/.gitignore at main · SW-Engineering-Team1/agricola_backend
