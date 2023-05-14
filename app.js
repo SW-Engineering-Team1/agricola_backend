@@ -1,6 +1,8 @@
 const express = require('express');
 const app = express();
 
+require('./models/index');
+
 app.set('port', process.env.PORT || 3000);
 
 app.get('/', (req, res) => {
