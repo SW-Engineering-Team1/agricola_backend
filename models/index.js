@@ -24,4 +24,6 @@ sequelize
         console.error(err);
     });
 
+db.users = require('./User.js')(sequelize, DataTypes);
+
 module.exports = db;
