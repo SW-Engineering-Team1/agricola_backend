@@ -21,4 +21,26 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
+  getRooms: async () => {
+    try {
+      let rooms = await GameRoom.findAll();
+      return response(baseResponse.SUCCESS, rooms);
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
+  deleteRoom: async (roomId) => {
+    try {
+      await GameRoom.destroy({
+        where: {
+          room_id: roomId,
+        },
+      });
+      return response(baseResponse.SUCCESS);
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }
 };
