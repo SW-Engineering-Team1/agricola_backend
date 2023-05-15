@@ -1,7 +1,7 @@
 const baseResponse = require('../config/baseResponseStatus');
 const { response, errResponse } = require('../config/response');
 const models = require('../models');
-const GameRoom = models.game_room;
+const GameRoom = models.gameroom;
 let crypto = require('crypto');
 
 module.exports = {
