@@ -25,5 +25,6 @@ sequelize
     });
 
 db.users = require('./User.js')(sequelize, DataTypes);
+db.game_room = require('./GameRoom.js')(sequelize, DataTypes);
 
 module.exports = db;
