@@ -16,9 +16,7 @@ module.exports = {
       });
       return response(baseResponse.SUCCESS);
     } catch (err) {
-      if (err.name == 'SequelizeUniqueConstraintError') {
-        return errResponse(baseResponse.SIGNUP_REDUNDANT_ID);
-      }
+      // TODO: error handling
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
     }

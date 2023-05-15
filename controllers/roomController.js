@@ -5,9 +5,6 @@ const roomService = require('../services/roomService');
 module.exports = {
     createRoom: async function (req, res) {
         try {
-            let id = req.body.id;
-            let password = req.body.password;
-
             let roomName = req.body.roomName;
             let limitNum = req.body.limitNum;
             let hostId = req.body.hostId;
