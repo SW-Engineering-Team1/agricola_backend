@@ -26,7 +26,7 @@ module.exports = {
   },
   deleteRoom: async function (req, res) {
     try {
-      let roomId = req.body.roomId;
+      let roomId = req.params.roomId;
       let deleteRoomResult = await roomService.deleteRoom(roomId);
       res.send(deleteRoomResult);
     } catch (err) {
