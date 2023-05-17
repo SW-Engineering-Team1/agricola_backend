@@ -25,5 +25,17 @@ sequelize
     });
 
 db.users = require('./User.js')(sequelize, DataTypes);
+db.gameroom = require('./GameRoom.js')(sequelize, DataTypes);
+
+db.users.hasMany(db.gameroom,{
+    foreignKey: 'host_id',
+    allowNull: false,
+    constraints: true,
+    onDelete: 'cascade',
+})
+
+db.gameroom.belongsTo(db.users,{
+    foreignKey: 'host_id',
+})
 
 module.exports = db;
