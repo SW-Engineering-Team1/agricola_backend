@@ -65,5 +65,27 @@ module.exports = {
       console.log(err);
       res.send(errResponse(baseResponse.SERVER_ERROR));
     }
+  },
+  exitRoom: async function (req, res) {
+    try {
+      let roomId = req.body.roomId;
+      let userId = req.body.userId;
+
+      // Check if the user is already in the room
+      let isInRoom = await roomService.checkIsInRoom(roomId, userId);
+      if (!isInRoom) {
+        res.send(errResponse(baseResponse.ROOM_NOT_JOINED));
+        return ;
+      }
+      // Subtract the participant number
+      await roomService.calParticipantNum(roomId, false);
+      
+      // Delete the user from the room
+      let exitRoomResult = await roomService.exitRoom(roomId, userId);
+      res.send(exitRoomResult);
+    } catch (err) {
+      console.log(err);
+      res.send(errResponse(baseResponse.SERVER_ERROR));
+    }
   }
 };

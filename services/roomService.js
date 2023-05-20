@@ -90,6 +90,20 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
+  exitRoom: async (roomId, userId) => {
+    try {
+      await UserGameRoom.destroy({
+        where: {
+          room_id: roomId,
+          user_id: userId,
+        },
+      });
+      return response(baseResponse.SUCCESS);
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
   calParticipantNum: async (roomId, isAdd) => {
     try {
       if (isAdd) {
