@@ -2,6 +2,18 @@ module.exports = {
     // Success
     SUCCESS: { isSuccess: true, code: 1000, message: '성공' },
 
+    ROOM_NOT_JOINED: {
+        isSuccess: false,
+        code: 404,
+        message: '참여하지 않은 방입니다.',
+    },
+
+    ROOM_ALREADY_JOINED: {
+        isSuccess: false,
+        code: 409,
+        message: '이미 참여한 방입니다.',
+    },
+
     // Common
     TOKEN_EMPTY: {
         isSuccess: false,
