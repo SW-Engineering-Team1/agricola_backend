@@ -25,4 +25,9 @@ module.exports = {
             res.send(errResponse(baseResponse.SERVER_ERROR));
         }
     },
+    getPayload: async (req, res) => {
+        res.send(
+            response(baseResponse.TOKEN_VERIFICATION_SUCCESS, { id: req.id })
+        );
+    },
 };
