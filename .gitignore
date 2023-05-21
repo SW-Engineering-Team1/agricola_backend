@@ -335,4 +335,7 @@ $RECYCLE.BIN/
 # Windows shortcuts
 *.lnk
 
+# Secret key
+secretKey.js
+
 # End of https://www.toptal.com/developers/gitignore/api/node,macos,windows,visualstudiocode,webstorm
