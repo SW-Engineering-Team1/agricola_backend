@@ -38,7 +38,7 @@ module.exports = function (io) {
               parseInt(roomId.dataValues.room_id),
               hostId
             );
-            socket.join(roomId);
+            socket.join(roomId.dataValues.room_id);
             io.sockets.emit('createRoom', createResult);
           }
         }
