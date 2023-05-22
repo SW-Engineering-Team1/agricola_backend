@@ -6,6 +6,32 @@ module.exports = function (io) {
   io.on('connection', function (socket) {
     socket.on('createRoom', createRoom);
     socket.on('getRooms', getRooms);
+    socket.on('exitRooms', exitRooms);
+
+    async function exitRooms(data) {
+      try {
+        let userId = data.userId;
+        let roomId = data.roomId;
+
+        // Check if the user is in the room
+        let isInRoom = await roomService.checkIsInRoom(roomId,userId);
+        if (!isInRoom) {
+          io.sockets.emit("exitRooms", errResponse(baseResponse.ROOM_NOT_JOINED));
+          return;
+        }
+
+        // Subtract the participant number
+        await roomService.calParticipantNum(roomId, false);
+
+        // Delete the user from the room
+        let exitRoomResult = await roomService.exitRoom(roomId, userId);
+        io.sockets.emit('exitRooms', exitRoomResult);
+
+      } catch (err) {
+        console.log(err);
+        io.sockets.emit('exitRooms', errResponse(baseResponse.SERVER_ERROR));
+      } 
+    }
 
     async function getRooms() {
       try {
