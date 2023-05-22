@@ -24,8 +24,8 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
-  findRoomId: async (hostId) =>{
-    try{
+  findRoomId: async (hostId) => {
+    try {
       let room = await GameRoom.findOne({
         where: {
           host_id: hostId,
@@ -41,8 +41,7 @@ module.exports = {
     try {
       let rooms = await GameRoom.findAll();
       return response(baseResponse.SUCCESS, rooms);
-    }  
-    catch (err) {
+    } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
     }
@@ -117,8 +116,7 @@ module.exports = {
             },
           }
         );
-      }
-      else {
+      } else {
         await GameRoom.update(
           {
             participant_num: sequelize.literal('participant_num - 1'),
@@ -134,5 +132,5 @@ module.exports = {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
     }
-  }
+  },
 };

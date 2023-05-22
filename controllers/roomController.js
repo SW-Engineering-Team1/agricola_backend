@@ -8,13 +8,20 @@ module.exports = {
       let roomName = req.body.roomName;
       let limitNum = req.body.limitNum;
       let hostId = req.body.hostId;
-      let createResult = await roomService.createRoom(roomName, limitNum, hostId);
+      let createResult = await roomService.createRoom(
+        roomName,
+        limitNum,
+        hostId
+      );
 
       // Find the room id
       let roomId = await roomService.findRoomId(hostId);
 
       // Add the participant number
-      await roomService.calParticipantNum(parseInt(roomId.dataValues.room_id), true);
+      await roomService.calParticipantNum(
+        parseInt(roomId.dataValues.room_id),
+        true
+      );
 
       // Add the host to the room
       await roomService.joinRoom(parseInt(roomId.dataValues.room_id), hostId);
@@ -53,11 +60,11 @@ module.exports = {
       let isInRoom = await roomService.checkIsInRoom(roomId, userId);
       if (isInRoom) {
         res.send(errResponse(baseResponse.ROOM_ALREADY_JOINED));
-        return ;
+        return;
       }
       // Add the participant number
       await roomService.calParticipantNum(roomId, true);
-      
+
       // Add the user to the room
       let joinRoomResult = await roomService.joinRoom(roomId, userId);
       res.send(joinRoomResult);
@@ -75,11 +82,11 @@ module.exports = {
       let isInRoom = await roomService.checkIsInRoom(roomId, userId);
       if (!isInRoom) {
         res.send(errResponse(baseResponse.ROOM_NOT_JOINED));
-        return ;
+        return;
       }
       // Subtract the participant number
       await roomService.calParticipantNum(roomId, false);
-      
+
       // Delete the user from the room
       let exitRoomResult = await roomService.exitRoom(roomId, userId);
       res.send(exitRoomResult);
@@ -87,5 +94,5 @@ module.exports = {
       console.log(err);
       res.send(errResponse(baseResponse.SERVER_ERROR));
     }
-  }
+  },
 };
