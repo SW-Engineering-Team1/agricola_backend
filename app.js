@@ -3,7 +3,7 @@ const app = express();
 const morgan = require('morgan');
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
-// const socketController = require('./controllers/socketController')(io);
+const socketController = require('./controllers/socketController')(io);
 
 var userRouter = require('./routes/userRoute');
 var roomRouter = require('./routes/roomRoute');
