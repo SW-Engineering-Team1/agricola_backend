@@ -8,7 +8,7 @@ module.exports = function (io) {
 
     async function createRoom(data) {
       try {
-        let roomName = data.roomId;
+        let roomName = data.roomName;
         let limitNum = data.limitNum;
         let hostId = data.hostId;
 
