@@ -33,12 +33,6 @@ module.exports = function (io) {
             // Find the room id
             let roomId = await roomService.findRoomId(hostId);
 
-            // Add the participant number
-            await roomService.calParticipantNum(
-              parseInt(roomId.dataValues.room_id),
-              true
-            );
-
             // Add the host to the room
             await roomService.joinRoom(
               parseInt(roomId.dataValues.room_id),
