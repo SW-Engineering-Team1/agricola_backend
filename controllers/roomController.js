@@ -8,25 +8,38 @@ module.exports = {
       let roomName = req.body.roomName;
       let limitNum = req.body.limitNum;
       let hostId = req.body.hostId;
-      let createResult = await roomService.createRoom(
-        roomName,
-        limitNum,
-        hostId
-      );
 
-      // Find the room id
-      let roomId = await roomService.findRoomId(hostId);
+      let isInRoom = await roomService.isInRoom(hostId);
+      if (isInRoom) {
+        return res.send(errResponse(baseResponse.ALREADY_IN_ROOM));
+      } else {
+        // Create the room
+        let createResult = await roomService.createRoom(
+          roomName,
+          limitNum,
+          hostId
+        );
 
-      // Add the participant number
-      await roomService.calParticipantNum(
-        parseInt(roomId.dataValues.room_id),
-        true
-      );
+        if (createResult.isSuccess === false) {
+          res.send(createResult);
+        } else {
+          // Find the room id
+          let roomId = await roomService.findRoomId(hostId);
 
-      // Add the host to the room
-      await roomService.joinRoom(parseInt(roomId.dataValues.room_id), hostId);
+          // Add the participant number
+          await roomService.calParticipantNum(
+            parseInt(roomId.dataValues.room_id),
+            true
+          );
 
-      res.send(createResult);
+          // Add the host to the room
+          await roomService.joinRoom(
+            parseInt(roomId.dataValues.room_id),
+            hostId
+          );
+          res.send(createResult);
+        }
+      }
     } catch (err) {
       console.log(err);
       res.send(errResponse(baseResponse.SERVER_ERROR));

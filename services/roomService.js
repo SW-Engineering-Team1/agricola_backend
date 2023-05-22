@@ -59,6 +59,23 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
+  isInRoom: async (userId) => {
+    try {
+      let isInRoom = await UserGameRoom.findOne({
+        where: {
+          user_id: userId,
+        },
+      });
+      if (isInRoom) {
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
   checkIsInRoom: async (roomId, userId) => {
     try {
       let isInRoom = await UserGameRoom.findOne({

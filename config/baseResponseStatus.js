@@ -20,6 +20,12 @@ module.exports = {
     message: '방이 꽉 찼습니다.',
   },
 
+  ALREADY_IN_ROOM: {
+    isSuccess: false,
+    code: 411,
+    message: '이미 방에 참여하고 있습니다.',
+  },
+
   // Common
   TOKEN_EMPTY: {
     isSuccess: false,
