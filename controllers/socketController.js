@@ -13,6 +13,17 @@ module.exports = function (io) {
         let userId = data.userId;
         let roomId = data.roomId;
 
+        let isHost = await roomService.checkIsHost(roomId, userId);
+        
+        // 로직 확인 필요
+        // 호스트일 경우 방을 삭제하는 거? ㅇㅋ 그럼 이 때 emit은 어디로 해야하는가
+        if(isHost){
+          // Delete the room
+          await roomService.deleteRoom(roomId);
+          io.sockets.emit('exitRooms', response(baseResponse.SUCCESS));
+          return;
+        }
+
         // Check if the user is in the room
         let isInRoom = await roomService.checkIsInRoom(roomId,userId);
         if (!isInRoom) {
