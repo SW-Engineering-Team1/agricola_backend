@@ -61,13 +61,18 @@ module.exports = {
       if (isInRoom) {
         res.send(errResponse(baseResponse.ROOM_ALREADY_JOINED));
         return;
-      }
-      // Add the participant number
-      await roomService.calParticipantNum(roomId, true);
+      } else {
+        // Add the participant number
+        let calResult = await roomService.calParticipantNum(roomId, true);
 
-      // Add the user to the room
-      let joinRoomResult = await roomService.joinRoom(roomId, userId);
-      res.send(joinRoomResult);
+        if (calResult.isSuccess === false) {
+          res.send(calResult);
+        } else {
+          // Add the user to the room
+          let joinRoomResult = await roomService.joinRoom(roomId, userId);
+          res.send(joinRoomResult);
+        }
+      }
     } catch (err) {
       console.log(err);
       res.send(errResponse(baseResponse.SERVER_ERROR));

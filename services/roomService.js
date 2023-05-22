@@ -105,18 +105,26 @@ module.exports = {
   },
   calParticipantNum: async (roomId, isAdd) => {
     try {
+      let updatedParticipantNum;
       if (isAdd) {
-        await GameRoom.update(
-          {
-            participant_num: sequelize.literal('participant_num + 1'),
-          },
-          {
-            where: {
-              room_id: roomId,
-            },
-          }
-        );
+        updatedParticipantNum = sequelize.literal('participant_num + 1');
       } else {
+        updatedParticipantNum = sequelize.literal('participant_num - 1');
+      }
+
+      await GameRoom.update(
+        {
+          participant_num: updatedParticipantNum,
+        },
+        {
+          where: {
+            room_id: roomId,
+          },
+        }
+      );
+
+      const room = await GameRoom.findByPk(roomId);
+      if (room.participant_num > room.limit_num) {
         await GameRoom.update(
           {
             participant_num: sequelize.literal('participant_num - 1'),
@@ -127,6 +135,9 @@ module.exports = {
             },
           }
         );
+        return errResponse(baseResponse.ROOM_IS_FULL);
+      } else {
+        return response(baseResponse.SUCCESS);
       }
     } catch (err) {
       console.log(err);
