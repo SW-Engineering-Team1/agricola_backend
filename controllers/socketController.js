@@ -6,7 +6,6 @@ module.exports = function (io) {
   io.on('connection', function (socket) {
     socket.on('createRoom', createRoom);
     socket.on('getRooms', getRooms);
-    socket.on('deleteRoom', deleteRoom);
 
     async function getRooms() {
       try {
@@ -15,17 +14,6 @@ module.exports = function (io) {
       } catch (err) {
         console.log(err);
         io.sockets.emit('getRooms', errResponse(baseResponse.SERVER_ERROR));
-      }
-    }
-
-    async function deleteRoom(data) {
-      try {
-        let roomId = data.roomId;
-        let deleteRoomResult = await roomService.deleteRoom(roomId);
-        io.sockets.emit('deleteRoom', deleteRoomResult);
-      } catch (err) {
-        console.log(err);
-        io.sockets.emit('deleteRoom', errResponse(baseResponse.SERVER_ERROR));
       }
     }
 
