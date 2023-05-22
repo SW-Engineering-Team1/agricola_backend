@@ -24,8 +24,8 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
-  findRoomId: async (hostId) =>{
-    try{
+  findRoomId: async (hostId) => {
+    try {
       let room = await GameRoom.findOne({
         where: {
           host_id: hostId,
@@ -41,8 +41,7 @@ module.exports = {
     try {
       let rooms = await GameRoom.findAll();
       return response(baseResponse.SUCCESS, rooms);
-    }  
-    catch (err) {
+    } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
     }
@@ -55,6 +54,23 @@ module.exports = {
         },
       });
       return response(baseResponse.SUCCESS);
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
+  isInRoom: async (userId) => {
+    try {
+      let isInRoom = await UserGameRoom.findOne({
+        where: {
+          user_id: userId,
+        },
+      });
+      if (isInRoom) {
+        return true;
+      } else {
+        return false;
+      }
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
@@ -106,19 +122,26 @@ module.exports = {
   },
   calParticipantNum: async (roomId, isAdd) => {
     try {
+      let updatedParticipantNum;
       if (isAdd) {
-        await GameRoom.update(
-          {
-            participant_num: sequelize.literal('participant_num + 1'),
-          },
-          {
-            where: {
-              room_id: roomId,
-            },
-          }
-        );
+        updatedParticipantNum = sequelize.literal('participant_num + 1');
+      } else {
+        updatedParticipantNum = sequelize.literal('participant_num - 1');
       }
-      else {
+
+      await GameRoom.update(
+        {
+          participant_num: updatedParticipantNum,
+        },
+        {
+          where: {
+            room_id: roomId,
+          },
+        }
+      );
+
+      const room = await GameRoom.findByPk(roomId);
+      if (room.participant_num > room.limit_num) {
         await GameRoom.update(
           {
             participant_num: sequelize.literal('participant_num - 1'),
@@ -129,10 +152,13 @@ module.exports = {
             },
           }
         );
+        return errResponse(baseResponse.ROOM_IS_FULL);
+      } else {
+        return response(baseResponse.SUCCESS);
       }
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
     }
-  }
+  },
 };
