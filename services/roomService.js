@@ -24,6 +24,24 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
+  checkIsHost: async (roomId, userId) => {
+    try{
+      let isHost = await GameRoom.findOne({
+        where: {
+          room_id: roomId,
+          host_id: userId,
+        },
+      });
+      if (isHost) {
+        return true;
+      }
+      return false;
+    }
+    catch(err){
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
   findRoomId: async (hostId) => {
     try {
       let room = await GameRoom.findOne({
