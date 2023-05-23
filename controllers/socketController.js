@@ -7,9 +7,10 @@ module.exports = function (io) {
     socket.on('createRoom', createRoom);
     socket.on('getRooms', getRooms);
     socket.on('joinRoom', joinRoom);
-    socket.on('exitRooms', exitRooms);
+    socket.on('exitRoom', exitRoom);
+    socket.on('enterLobby', enterLobby);
 
-    async function exitRooms(data) {
+    async function exitRoom(data) {
       try {
         let userId = data.userId;
         let roomId = data.roomId;
@@ -21,7 +22,7 @@ module.exports = function (io) {
         if (isHost) {
           // Delete the room
           await roomService.deleteRoom(roomId);
-          io.sockets.emit('exitRooms', response(baseResponse.SUCCESS));
+          io.sockets.emit('exitRoom', response(baseResponse.SUCCESS));
           return;
         }
 
@@ -32,6 +33,7 @@ module.exports = function (io) {
             'exitRooms',
             errResponse(baseResponse.ROOM_NOT_JOINED)
           );
+          io.sockets.emit("exitRoom", errResponse(baseResponse.ROOM_NOT_JOINED));
           return;
         }
 
@@ -47,7 +49,7 @@ module.exports = function (io) {
       }
     }
 
-    async function getRooms() {
+    async function enterLobby() {
       try {
         let getRoomsResult = await roomService.getRooms();
         io.sockets.emit('getRooms', getRoomsResult);
