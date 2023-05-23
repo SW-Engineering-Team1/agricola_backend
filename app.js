@@ -4,11 +4,19 @@ const morgan = require('morgan');
 const http = require('http').Server(app);
 const io = require('socket.io')(http);
 const socketController = require('./controllers/socketController')(io);
+const cors = require('cors');
 
 var userRouter = require('./routes/userRoute');
 var roomRouter = require('./routes/roomRoute');
 
 require('./models/index');
+
+const corsOptions = {
+  origin: '*',
+  credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.set('port', process.env.PORT || 3000);
 

@@ -4,11 +4,11 @@ const roomService = require('../services/roomService');
 
 module.exports = function (io) {
   io.on('connection', function (socket) {
+    socket.on('enterLobby', enterLobby);
     socket.on('createRoom', createRoom);
-    socket.on('getRooms', getRooms);
+    // socket.on('getRooms', getRooms);
     socket.on('joinRoom', joinRoom);
     socket.on('exitRoom', exitRoom);
-    socket.on('enterLobby', enterLobby);
 
     async function exitRoom(data) {
       try {
@@ -17,12 +17,10 @@ module.exports = function (io) {
 
         let isHost = await roomService.checkIsHost(roomId, userId);
 
-        // 로직 확인 필요
-        // 호스트일 경우 방을 삭제하는 거? ㅇㅋ 그럼 이 때 emit은 어디로 해야하는가
         if (isHost) {
           // Delete the room
           await roomService.deleteRoom(roomId);
-          io.sockets.emit('exitRoom', response(baseResponse.SUCCESS));
+          io.sockets.emit('patchRoomList', getRoomsResult);
           return;
         }
 
@@ -30,10 +28,9 @@ module.exports = function (io) {
         let isInRoom = await roomService.checkIsInRoom(roomId, userId);
         if (!isInRoom) {
           io.sockets.emit(
-            'exitRooms',
+            'exitRoom',
             errResponse(baseResponse.ROOM_NOT_JOINED)
           );
-          io.sockets.emit("exitRoom", errResponse(baseResponse.ROOM_NOT_JOINED));
           return;
         }
 
@@ -41,8 +38,11 @@ module.exports = function (io) {
         await roomService.calParticipantNum(roomId, false);
 
         // Delete the user from the room
-        let exitRoomResult = await roomService.exitRoom(roomId, userId);
-        io.sockets.emit('exitRooms', exitRoomResult);
+        await roomService.exitRoom(roomId, userId);
+
+        let roomDetail = await roomService.getRoom(roomId);
+        io.sockets.emit('updatedRoom', roomDetail);
+
       } catch (err) {
         console.log(err);
         io.sockets.emit('exitRooms', errResponse(baseResponse.SERVER_ERROR));
@@ -52,10 +52,10 @@ module.exports = function (io) {
     async function enterLobby() {
       try {
         let getRoomsResult = await roomService.getRooms();
-        io.sockets.emit('getRooms', getRoomsResult);
+        io.sockets.emit('patchRoomList', getRoomsResult);
       } catch (err) {
         console.log(err);
-        io.sockets.emit('getRooms', errResponse(baseResponse.SERVER_ERROR));
+        io.sockets.emit('patchRoomList', errResponse(baseResponse.SERVER_ERROR));
       }
     }
 
@@ -92,7 +92,8 @@ module.exports = function (io) {
               hostId
             );
             socket.join(roomId.dataValues.room_id);
-            io.sockets.emit('createRoom', createResult);
+            let getRoomsResult = await roomService.getRooms();
+            io.sockets.emit('patchRoomList', getRoomsResult);
           }
         }
       } catch (err) {
@@ -121,9 +122,11 @@ module.exports = function (io) {
             io.sockets.emit('joinRoom', calResult);
           } else {
             // Add the user to the room
-            let joinRoomResult = await roomService.joinRoom(roomId, userId);
+            await roomService.joinRoom(roomId, userId);
             socket.join(parseInt(roomId));
-            io.sockets.emit('joinRoom', joinRoomResult);
+
+            let roomDetail = await roomService.getRoom(roomId);
+            io.sockets.emit('updatedRoom', roomDetail);
           }
         }
       } catch (err) {

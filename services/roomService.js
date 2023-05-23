@@ -64,6 +64,15 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
+  getRoom: async (roomId) => {
+    try{
+      let room = await GameRoom.findByPk(roomId);
+      return response(baseResponse.SUCCESS, room);
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
   deleteRoom: async (roomId) => {
     try {
       await GameRoom.destroy({
