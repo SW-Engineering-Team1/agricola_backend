@@ -10,6 +10,19 @@ module.exports = function (io) {
     socket.on('joinRoom', joinRoom);
     socket.on('exitRoom', exitRoom);
 
+    socket.on('patchGameStatus', patchGameStatus);
+
+    async function patchGameStatus(data) {
+      try {
+        await roomService.patchGameStatus(data);
+        let gameStatus = await roomService.getGameStatus(data.roomId);
+        console.log(gameStatus);
+        io.to(data.roomId).emit('patchGameStatus', gameStatus);
+      } catch (err) {
+        console.log(err);
+      }
+    }
+
     async function exitRoom(data) {
       try {
         let userId = data.userId;
