@@ -2,59 +2,59 @@ module.exports = (sequelize, DataTypes) => {
   const GameStatus = sequelize.define(
     'GameStatus',
     {
-      roomId: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-        primaryKey: true,
-      },
-      userId: {
-        type: DataTypes.STRING(128),
-        allowNull: false,
-        primaryKey: true,
-      },
+      // roomId: {
+      //   type: DataTypes.INTEGER,
+      //   allowNull: false,
+      //   primaryKey: true,
+      // },
+      // userId: {
+      //   type: DataTypes.STRING(20),
+      //   allowNull: false,
+      //   primaryKey: true,
+      // },
       isMyTurn: {
         type: DataTypes.BOOLEAN,
       },
-      orderNum: {
+      order: {
         type: DataTypes.INTEGER,
       },
-      sheepNum: {
+      sheep: {
         type: DataTypes.INTEGER,
       },
-      pigNum: {
+      pig: {
         type: DataTypes.INTEGER,
       },
-      cowNum: {
+      cow: {
         type: DataTypes.INTEGER,
       },
-      woodNum: {
+      wood: {
         type: DataTypes.INTEGER,
       },
-      sandNum: {
+      sand: {
         type: DataTypes.INTEGER,
       },
-      reedNum: {
+      reed: {
         type: DataTypes.INTEGER,
       },
-      stoneNum: {
+      stone: {
         type: DataTypes.INTEGER,
       },
-      grainOnStorageNum: {
+      grainOnStorage: {
         type: DataTypes.INTEGER,
       },
-      vegeOnStorageNum: {
+      vegeOnStorage: {
         type: DataTypes.INTEGER,
       },
-      grainOnFieldNum: {
+      grainOnField: {
         type: DataTypes.INTEGER,
       },
-      vegeOnFieldNum: {
+      vegeOnField: {
         type: DataTypes.INTEGER,
       },
-      grainDoingNum: {
+      grainDoing: {
         type: DataTypes.INTEGER,
       },
-      vegeDoingNum: {
+      vegeDoing: {
         type: DataTypes.INTEGER,
       },
       remainedFence: {
@@ -66,25 +66,25 @@ module.exports = (sequelize, DataTypes) => {
       remainedFamily: {
         type: DataTypes.INTEGER,
       },
-      adultNum: {
+      adult: {
         type: DataTypes.INTEGER,
       },
-      babyNum: {
+      baby: {
         type: DataTypes.INTEGER,
       },
-      woodHouseNumber: {
+      woodHouse: {
         type: DataTypes.INTEGER,
       },
-      sandHouseNum: {
+      sandHouse: {
         type: DataTypes.INTEGER,
       },
-      stoneHouseNum: {
+      stoneHouse: {
         type: DataTypes.INTEGER,
       },
-      fieldNum: {
+      field: {
         type: DataTypes.INTEGER,
       },
-      foodNum: {
+      food: {
         type: DataTypes.INTEGER,
       },
       remainedJobCard: {
@@ -107,11 +107,12 @@ module.exports = (sequelize, DataTypes) => {
       },
       numOfBeggingToken: {
         type: DataTypes.INTEGER,
-      }
+      },
     },
     {
       timestamps: false,
     }
   );
+
   return GameStatus;
 };
