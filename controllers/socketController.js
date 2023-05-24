@@ -14,9 +14,10 @@ module.exports = function (io) {
     socket.on('useActionSpace', useActionSpace);
 
     async function useActionSpace(data) {
-      if (data.actionName == '어쩌고') {
-        // logic
-      }
+      // else
+      let updateResult = await gameServce.updateGoods(data.userId, data.goods);
+      io.to(data.roomId).emit('useActionSpace', updateResult);
+      // io.sockets.emit('useActionSpace', updateResult);
     }
 
     socket.on('patchGameStatus', patchGameStatus);
