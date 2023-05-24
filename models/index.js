@@ -66,11 +66,11 @@ db.user_gameroom.belongsTo(db.gameroom,{
 
 
 db.game_status.belongsTo(db.gameroom,{
-    foreignKey: 'room_id',
+    foreignKey: 'roomId',
 })
 
 db.game_status.belongsTo(db.users,{
-    foreignKEy: 'user_id',
+    foreignKEy: 'userId',
 })
 
 
