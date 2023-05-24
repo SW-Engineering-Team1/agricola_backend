@@ -5,15 +5,24 @@ const GameStatus = models.game_status;
 const sequelize = require('sequelize');
 
 module.exports = {
-  updateGoods: async function (goodsList, userId) {
+  checkGoodsValidity: function (goodsList, updateResults) {
+    for (let i = 0; i < goodsList.length; i++) {
+      const { name, num, isAdd } = goodsList[i];
+      const updatedQuantity = updateResults[name];
+
+      if (!isAdd && updatedQuantity < 0) {
+        return false;
+      }
+    }
+    return true;
+  },
+  updateGoods: async function (userId, goodsList) {
     try {
-      const updatePromises = goodsList.map(async (goods) => {
-        const { goodsName, num, isAdd } = goods;
-        return await GameStatus.update(
+      for (const goods of goodsList) {
+        const { name, num, isAdd } = goods;
+        await GameStatus.update(
           {
-            [goodsName]: sequelize.literal(
-              `${goodsName} ${isAdd ? '+' : '-'} ${num}`
-            ),
+            [name]: sequelize.literal(`${name} ${isAdd ? '+' : '-'} ${num}`),
           },
           {
             where: {
@@ -21,9 +30,28 @@ module.exports = {
             },
           }
         );
+      }
+      const updateResults = await GameStatus.findOne({
+        where: { userId: userId },
       });
 
-      const updateResults = await Promise.all(updatePromises);
+      const isValid = this.checkGoodsValidity(goodsList, updateResults);
+      if (!isValid) {
+        for (const goods of goodsList) {
+          const { name, num, isAdd } = goods;
+          await GameStatus.update(
+            {
+              [name]: sequelize.literal(`${name} ${isAdd ? '-' : '+'} ${num}`),
+            },
+            {
+              where: {
+                userId,
+              },
+            }
+          );
+        }
+        return errResponse(baseResponse.INVALID_GOODS_QUANTITY);
+      }
       return updateResults;
     } catch (err) {
       console.log(err);

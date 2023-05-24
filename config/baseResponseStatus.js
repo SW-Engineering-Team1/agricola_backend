@@ -2,6 +2,12 @@ module.exports = {
   // Success
   SUCCESS: { isSuccess: true, code: 1000, message: '성공' },
 
+  INVALID_GOODS_QUANTITY: {
+    isSuccess: false,
+    code: 2000,
+    message: '물건의 수량이 올바르지 않습니다.',
+  },
+
   ROOM_NOT_JOINED: {
     isSuccess: false,
     code: 404,
