@@ -67,10 +67,15 @@ db.user_gameroom.belongsTo(db.gameroom,{
 
 db.game_status.belongsTo(db.gameroom,{
     foreignKey: 'roomId',
+    targetKey: 'room_id',
+    onDelete: 'cascade',
+
 })
 
 db.game_status.belongsTo(db.users,{
     foreignKEy: 'userId',
+    targetKey: 'id',
+    onDelete: 'cascade',
 })
 
 
