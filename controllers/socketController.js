@@ -10,6 +10,15 @@ module.exports = function (io) {
     socket.on('joinRoom', joinRoom);
     socket.on('exitRoom', exitRoom);
 
+    socket.on('useActionSpace', useActionSpace);
+
+    async function useActionSpace (data){
+      if(data.actionName == '어쩌고'){
+        // logic
+      }
+
+    }
+
     socket.on('patchGameStatus', patchGameStatus);
 
     async function patchGameStatus(data) {
