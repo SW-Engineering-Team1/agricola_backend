@@ -2,6 +2,12 @@ module.exports = {
   // Success
   SUCCESS: { isSuccess: true, code: 1000, message: '성공' },
 
+  NOT_ENOUGHDATA: {
+    isSuccess: false,
+    code: 400,
+    message: '필요한 정보가 부족합니다.',
+  },
+
   ROOM_NOT_JOINED: {
     isSuccess: false,
     code: 404,

@@ -3,6 +3,7 @@ const { response, errResponse } = require('../config/response');
 const models = require('../models');
 const GameStatus = models.game_status;
 const sequelize = require('sequelize');
+const { Op } = require('sequelize');
 
 module.exports = {
   updateGoods: async function (goodsList, userId) {
@@ -30,4 +31,37 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
+  isExistMajorImprovementCard: async function (goodsName, userId) {
+    console.log(goodsName)
+    try{
+      const gameStatus = await GameStatus.findOne({
+        where: {
+          userId,
+          [Op.or]: [
+            {
+              remainedSubFacilityCard: {
+                [Op.like]: "%" + goodsName + "%"
+              },
+            },
+            {
+              remainedMainFacilityCard: {
+                [Op.like]: "%" + goodsName + "%"
+              },
+            },
+          ]
+        },
+      });
+      console.log(gameStatus);
+
+      // const majorImprovementCards = JSON.parse(gameStatus.majorImprovementCards);
+      // const isExist = majorImprovementCards.some((card) => {
+      //   return card.name === goodsName;
+      // });
+      let isExist = false;
+      return isExist;
+    } catch(err){
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  }
 };
