@@ -14,11 +14,12 @@ module.exports = function (io) {
 
     socket.on('useActionSpace', useActionSpace);
 
-    async function useActionSpace (data){
-      if(data.actionName == 'Major Improvement'){
+    async function useActionSpace(data) {
+      // 주요설비 사용 이벤트
+      if (data.actionName === 'Major Improvement') {
         let isExist = await gameService.isExistFacilityCard(data.goods[0].name, data.userId, data.roomId);
-        if(isExist === "main"){
-          
+        if (isExist === "main") {
+
           // 총 emit 두 개(게임 방의 주요설비 판 내용 + 플레이어의 주요설비 리스트)
           await gameService.updateFacilityCard(data.goods[0].name, data.userId, data.roomId, isExist);
 
@@ -29,7 +30,7 @@ module.exports = function (io) {
           // 주요설비를 사용한 플레이어의 상태 emit 필요
           let updatedPlayer = await gameService.getPlayerStatus(data.userId, data.roomId);
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
-        } else if(isExist === "sub"){
+        } else if (isExist === "sub") {
           // 총 emit 한 개(플레이어의 보조설비 리스트)
 
           // 보조설비를 사용한 플레이어의 상태 emit 필요
@@ -37,15 +38,41 @@ module.exports = function (io) {
           let updatedPlayer = await gameService.getPlayerStatus(data.userId, data.roomId);
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
         }
-        else{
+        else {
           response(baseResponse.NOT_ENOUGHDATA);
         }
       }
-      else{
-      // else
-      let updateResult = await gameService.updateGoods(data.userId, data.goods);
-      io.to(data.roomId).emit('useActionSpace', updateResult);
-      // io.sockets.emit('useActionSpace', updateResult);
+      // 씨뿌리기 이벤트
+      else if (data.actionName === "Grain Utilization") {
+        let tmp = JSON.parse(JSON.stringify(data.goods));
+        tmp[0].name = tmp[0].name + "OnStorage";
+        gameService.updateGoods(data.userId, tmp);
+
+        data.goods[0].name = data.goods[0].name + "Doing"
+        data.goods[0].isAdd = true;
+
+        let updateResult = gameService.updateGoods(data.userId, data.goods);
+        io.to(data.roomId).emit('useActionSpace', updateResult);
+      }
+      // 빵 굽기 이벤트
+      else if (data.actionName === "Bake Bread") {
+        
+        data.goods[0].name = data.goods[0].name + "OnStorage";
+        await gameService.updateGoods(data.userId, data.goods);
+
+        data.goods[0].name = "food";
+        data.goods[0].num = parseInt(data.goods[0].num) * 5;
+        data.goods[0].isAdd = true;
+
+
+        let updateResult = await gameService.updateGoods(data.userId, data.goods);
+        io.to(data.roomId).emit('useActionSpace', updateResult);
+      }
+      else {
+        // else
+        let updateResult = await gameService.updateGoods(data.userId, data.goods);
+        io.to(data.roomId).emit('useActionSpace', updateResult);
+        // io.sockets.emit('useActionSpace', updateResult);
       }
     }
 
