@@ -1,12 +1,10 @@
 const jwt = require('jsonwebtoken');
 const secretKey = require('../config/secretKey').secretKey;
-const accessTokenExpiresIn = '1d';
+const options = require('../config/secretKey').options;
 
 module.exports = {
     generateToken: async (user) => {
-        const token = jwt.sign(user.id, secretKey, {
-            expiresIn: accessTokenExpiresIn,
-        });
+        const token = jwt.sign(user.id, secretKey, options);
         return token;
     },
     verifyToken: async (token) => {
