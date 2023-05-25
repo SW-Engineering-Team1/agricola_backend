@@ -73,15 +73,27 @@ module.exports = function (io) {
             return;
           }
           // 보조 설비 1개 내려놓기
-          let cardResult = await gameService.updateFacilityCard(
+          let isExist = await gameService.isExistFacilityCard(
             data.goods[1].name,
             data.userId,
-            data.roomId,
-            'sub'
+            data.roomId
           );
-          if (cardResult.isSuccess === false) {
-            io.to(data.roomId).emit('useActionSpace', cardResult);
-            return;
+          if (isExist === 'sub') {
+            let cardResult = await gameService.updateFacilityCard(
+              data.goods[1].name,
+              data.userId,
+              data.roomId,
+              'sub'
+            );
+            if (cardResult.isSuccess === false) {
+              io.to(data.roomId).emit('useActionSpace', cardResult);
+              return;
+            }
+          } else {
+            io.to(data.roomId).emit(
+              'useActionSpace',
+              baseResponse.INVALID_CARD_NAME
+            );
           }
           // 업데이트 된 플레이어 상태 emit
           let updateResult = await gameService.getPlayerStatus(
@@ -104,15 +116,28 @@ module.exports = function (io) {
           }
           // 보조 설비 1개 내려놓기
           else {
-            let cardResult = await gameService.updateFacilityCard(
+            let isExist = await gameService.isExistFacilityCard(
               data.goods[0].name,
               data.userId,
-              data.roomId,
-              'sub'
+              data.roomId
             );
-            if (cardResult.isSuccess === false) {
-              io.to(data.roomId).emit('useActionSpace', cardResult);
-              return;
+            if (isExist === 'sub') {
+              let cardResult = await gameService.updateFacilityCard(
+                data.goods[0].name,
+                data.userId,
+                data.roomId,
+                'sub'
+              );
+              if (cardResult.isSuccess === false) {
+                io.to(data.roomId).emit('useActionSpace', cardResult);
+                return;
+              }
+            } else {
+              io.to(data.roomId).emit(
+                'useActionSpace',
+                baseResponse.INVALID_CARD_NAME
+              );
+              io.sockets.emit('useActionSpace', baseResponse.INVALID_CARD_NAME);
             }
           }
           let updateResult = await gameService.getPlayerStatus(

@@ -7,7 +7,13 @@ module.exports = {
     code: 400,
     message: '필요한 정보가 부족합니다.',
   },
-  
+
+  INVALID_CARD_NAME: {
+    isSuccess: false,
+    code: 2000,
+    message: '소유하고 있지 않은 카드입니다.',
+  },
+
   INVALID_GOODS_QUANTITY: {
     isSuccess: false,
     code: 2000,
