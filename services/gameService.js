@@ -104,7 +104,7 @@ module.exports = {
         });
         const updatedRemainedMainFacilityCard = gameRoom.dataValues.remainedMainFacilityCard.filter((card) => card != goodsName);
         const updatedUsedMainFacilityCard = gameStatus.dataValues.usedMainFacilityCard.concat(goodsName);
-        let tmp = await GameRooms.update(
+        await GameRooms.update(
           {
             remainedMainFacilityCard: updatedRemainedMainFacilityCard,
           },
@@ -114,8 +114,6 @@ module.exports = {
             },
           }
         )
-        // return 1
-        // console.log(tmp)
         await GameStatus.update(
           {
             usedMainFacilityCard: updatedUsedMainFacilityCard,
