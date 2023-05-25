@@ -64,24 +64,31 @@ module.exports = {
       const remainedMainFacilityCard = await GameRooms.findOne({
         where: {
           room_id: roomId,
-        }
-      })
-      if (remainedMainFacilityCard.dataValues.remainedMainFacilityCard.includes(goodsName)) {
-        return "main"
+        },
+      });
+      if (
+        remainedMainFacilityCard.dataValues.remainedMainFacilityCard.includes(
+          goodsName
+        )
+      ) {
+        return 'main';
       }
       // 주요 설비에 해당 카드가 없으므로 플레이어가 갖고 있는 보조 설비에서 보조설비 카드 쿼리
       else {
         const remainedSubFacilityCard = await GameStatus.findOne({
           where: {
             userId,
-          }
-        })
-        if (remainedSubFacilityCard.dataValues.remainedSubFacilityCard.includes(goodsName)) {
-          return "sub"
-        }
-        else {
+          },
+        });
+        if (
+          remainedSubFacilityCard.dataValues.remainedSubFacilityCard.includes(
+            goodsName
+          )
+        ) {
+          return 'sub';
+        } else {
           // 어디에도 카드가 없으므로 none 리턴
-          return "none"
+          return 'none';
         }
       }
     } catch (err) {
@@ -90,20 +97,24 @@ module.exports = {
     }
   },
   updateFacilityCard: async function (goodsName, userId, roomId, type) {
-    if (type === "main") {
+    if (type === 'main') {
       try {
         const gameRoom = await GameRooms.findOne({
           where: {
             room_id: roomId,
-          }
+          },
         });
         const gameStatus = await GameStatus.findOne({
           where: {
             userId,
-          }
+          },
         });
-        const updatedRemainedMainFacilityCard = gameRoom.dataValues.remainedMainFacilityCard.filter((card) => card != goodsName);
-        const updatedUsedMainFacilityCard = gameStatus.dataValues.usedMainFacilityCard.concat(goodsName);
+        const updatedRemainedMainFacilityCard =
+          gameRoom.dataValues.remainedMainFacilityCard.filter(
+            (card) => card != goodsName
+          );
+        const updatedUsedMainFacilityCard =
+          gameStatus.dataValues.usedMainFacilityCard.concat(goodsName);
         await GameRooms.update(
           {
             remainedMainFacilityCard: updatedRemainedMainFacilityCard,
@@ -113,7 +124,7 @@ module.exports = {
               room_id: roomId,
             },
           }
-        )
+        );
         await GameStatus.update(
           {
             usedMainFacilityCard: updatedUsedMainFacilityCard,
@@ -123,22 +134,24 @@ module.exports = {
               userId,
             },
           }
-        )
-      }
-      catch (err) {
+        );
+      } catch (err) {
         console.log(err);
         return errResponse(baseResponse.DB_ERROR);
       }
-    }
-    else {
+    } else {
       try {
         const gameStatus = await GameStatus.findOne({
           where: {
             userId,
           },
         });
-        const updatedRemainedSubFacilityCard = gameStatus.dataValues.remainedSubFacilityCard.filter((card) => card != goodsName);
-        const updatedUsedSubFacilityCard = gameStatus.dataValues.usedSubFacilityCard.concat(goodsName);
+        const updatedRemainedSubFacilityCard =
+          gameStatus.dataValues.remainedSubFacilityCard.filter(
+            (card) => card != goodsName
+          );
+        const updatedUsedSubFacilityCard =
+          gameStatus.dataValues.usedSubFacilityCard.concat(goodsName);
 
         await GameStatus.update(
           {
@@ -168,14 +181,14 @@ module.exports = {
       }
     }
   },
-  getMainFacilityCards: async function(roomId) {
+  getMainFacilityCards: async function (roomId) {
     try {
       const gameRoom = await GameRooms.findOne({
         where: {
           room_id: roomId,
-        }
-      })
-      return gameRoom.dataValues
+        },
+      });
+      return gameRoom.dataValues;
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
@@ -190,11 +203,9 @@ module.exports = {
         },
       });
       return playerDetail.dataValues;
-    } catch(err){
+    } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
     }
-  }
-
-
+  },
 };
