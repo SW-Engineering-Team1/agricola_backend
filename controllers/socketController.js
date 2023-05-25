@@ -1,7 +1,7 @@
 const baseResponse = require('../config/baseResponseStatus');
 const { response, errResponse } = require('../config/response');
 const roomService = require('../services/roomService');
-const gameService = require('../services/gameService');
+const gameServce = require('../services/gameService');
 
 module.exports = function (io) {
   io.on('connection', function (socket) {
@@ -25,6 +25,12 @@ module.exports = function (io) {
         else{
           response(baseResponse.NOT_ENOUGHDATA);
         }
+      }
+      else{
+      // else
+      let updateResult = await gameServce.updateGoods(data.userId, data.goods);
+      io.to(data.roomId).emit('useActionSpace', updateResult);
+      // io.sockets.emit('useActionSpace', updateResult);
       }
     }
 
@@ -71,7 +77,6 @@ module.exports = function (io) {
 
         let roomDetail = await roomService.getRoom(roomId);
         io.sockets.emit('updatedRoom', roomDetail);
-
       } catch (err) {
         console.log(err);
         io.sockets.emit('exitRooms', errResponse(baseResponse.SERVER_ERROR));
@@ -84,7 +89,10 @@ module.exports = function (io) {
         io.sockets.emit('patchRoomList', getRoomsResult);
       } catch (err) {
         console.log(err);
-        io.sockets.emit('patchRoomList', errResponse(baseResponse.SERVER_ERROR));
+        io.sockets.emit(
+          'patchRoomList',
+          errResponse(baseResponse.SERVER_ERROR)
+        );
       }
     }
 

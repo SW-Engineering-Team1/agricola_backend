@@ -7,6 +7,12 @@ module.exports = {
     code: 400,
     message: '필요한 정보가 부족합니다.',
   },
+  
+  INVALID_GOODS_QUANTITY: {
+    isSuccess: false,
+    code: 2000,
+    message: '물건의 수량이 올바르지 않습니다.',
+  },
 
   ROOM_NOT_JOINED: {
     isSuccess: false,
