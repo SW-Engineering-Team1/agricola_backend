@@ -1,7 +1,7 @@
 const baseResponse = require('../config/baseResponseStatus');
 const { response, errResponse } = require('../config/response');
 const roomService = require('../services/roomService');
-const gameServce = require('../services/gameService');
+const gameService = require('../services/gameService');
 
 module.exports = function (io) {
   io.on('connection', function (socket) {
@@ -10,17 +10,44 @@ module.exports = function (io) {
     // socket.on('getRooms', getRooms);
     socket.on('joinRoom', joinRoom);
     socket.on('exitRoom', exitRoom);
+    socket.on('patchGameStatus', patchGameStatus);
 
     socket.on('useActionSpace', useActionSpace);
 
-    async function useActionSpace(data) {
+    async function useActionSpace (data){
+      if(data.actionName == 'Major Improvement'){
+        let isExist = await gameService.isExistFacilityCard(data.goods[0].name, data.userId, data.roomId);
+        if(isExist === "main"){
+          
+          // 총 emit 두 개(게임 방의 주요설비 판 내용 + 플레이어의 주요설비 리스트)
+          await gameService.updateFacilityCard(data.goods[0].name, data.userId, data.roomId, isExist);
+
+          // 주요설비 관련 내용 emit 
+          let updatedFacilityList = await gameService.getMainFacilityCards(data.roomId);
+          io.to(data.roomId).emit('useActionSpace', updatedFacilityList);
+
+          // 주요설비를 사용한 플레이어의 상태 emit 필요
+          let updatedPlayer = await gameService.getPlayerStatus(data.userId, data.roomId);
+          io.to(data.roomId).emit('useActionSpace', updatedPlayer);
+        } else if(isExist === "sub"){
+          // 총 emit 한 개(플레이어의 보조설비 리스트)
+
+          // 보조설비를 사용한 플레이어의 상태 emit 필요
+          await gameService.updateFacilityCard(data.goods[0].name, data.userId, data.roomId, isExist);
+          let updatedPlayer = await gameService.getPlayerStatus(data.userId, data.roomId);
+          io.to(data.roomId).emit('useActionSpace', updatedPlayer);
+        }
+        else{
+          response(baseResponse.NOT_ENOUGHDATA);
+        }
+      }
+      else{
       // else
-      let updateResult = await gameServce.updateGoods(data.userId, data.goods);
+      let updateResult = await gameService.updateGoods(data.userId, data.goods);
       io.to(data.roomId).emit('useActionSpace', updateResult);
       // io.sockets.emit('useActionSpace', updateResult);
+      }
     }
-
-    socket.on('patchGameStatus', patchGameStatus);
 
     async function patchGameStatus(data) {
       try {
