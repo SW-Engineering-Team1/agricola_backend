@@ -60,6 +60,68 @@ module.exports = function (io) {
         } else {
           response(baseResponse.NOT_ENOUGHDATA);
         }
+      } else if (data.actionName === 'Meeting Place') {
+        // 시작 플레이어 되기 그리고 보조 설비 1개 내려놓기
+        if (data.goods.length === 2) {
+          // 시작 플레이어 되기
+          let updateOrderResult = await gameService.updateOrder(
+            data.roomId,
+            data.userId
+          );
+          if (updateOrderResult.isSuccess === false) {
+            io.to(data.roomId).emit('useActionSpace', updateOrderResult);
+            return;
+          }
+          // 보조 설비 1개 내려놓기
+          let cardResult = await gameService.updateFacilityCard(
+            data.goods[1].name,
+            data.userId,
+            data.roomId,
+            'sub'
+          );
+          if (cardResult.isSuccess === false) {
+            io.to(data.roomId).emit('useActionSpace', cardResult);
+            return;
+          }
+          // 업데이트 된 플레이어 상태 emit
+          let updateResult = await gameService.getPlayerStatus(
+            data.userId,
+            data.roomId
+          );
+          io.to(data.roomId).emit('useActionSpace', updateResult);
+        } else {
+          let updateOrderResult = null;
+          // 시작 플레이어 되기
+          if (data.goods[0].name === 'order') {
+            updateOrderResult = await gameService.updateOrder(
+              data.roomId,
+              data.userId
+            );
+            if (updateOrderResult.isSuccess === false) {
+              io.to(data.roomId).emit('useActionSpace', updateOrderResult);
+              return;
+            }
+          }
+          // 보조 설비 1개 내려놓기
+          else {
+            let cardResult = await gameService.updateFacilityCard(
+              data.goods[0].name,
+              data.userId,
+              data.roomId,
+              'sub'
+            );
+            if (cardResult.isSuccess === false) {
+              io.to(data.roomId).emit('useActionSpace', cardResult);
+              return;
+            }
+          }
+          let updateResult = await gameService.getPlayerStatus(
+            data.userId,
+            data.roomId
+          );
+          io.to(data.roomId).emit('useActionSpace', updateResult);
+          // io.sockets.emit('useActionSpace', updateResult);
+        }
       } else {
         // else
         let updateResult = await gameService.updateGoods(

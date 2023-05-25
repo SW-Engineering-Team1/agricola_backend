@@ -4,6 +4,7 @@ const models = require('../models');
 const GameStatus = models.game_status;
 const GameRooms = models.gameroom;
 const sequelize = require('sequelize');
+const Op = sequelize.Op;
 
 module.exports = {
   checkGoodsValidity: function (goodsList, updateResults) {
@@ -203,6 +204,37 @@ module.exports = {
         },
       });
       return playerDetail.dataValues;
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
+  updateOrder: async function (roomId, userId) {
+    try {
+      await GameStatus.update(
+        {
+          nextOrder: 1,
+        },
+        {
+          where: {
+            userId,
+          },
+        }
+      );
+      await GameStatus.update(
+        {
+          nextOrder: 2,
+        },
+        {
+          where: {
+            roomId,
+            userId: {
+              [Op.not]: userId,
+            },
+          },
+        }
+      );
+      return response(baseResponse.SUCCESS);
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);

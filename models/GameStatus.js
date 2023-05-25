@@ -18,6 +18,9 @@ module.exports = (sequelize, DataTypes) => {
       order: {
         type: DataTypes.INTEGER,
       },
+      nextOrder: {
+        type: DataTypes.INTEGER,
+      },
       sheep: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
