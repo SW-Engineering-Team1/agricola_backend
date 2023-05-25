@@ -1,7 +1,7 @@
 const baseResponse = require('../config/baseResponseStatus');
 const { response, errResponse } = require('../config/response');
 const roomService = require('../services/roomService');
-const gameServce = require('../services/gameService');
+const gameService = require('../services/gameService');
 
 module.exports = function (io) {
   io.on('connection', function (socket) {
@@ -28,7 +28,7 @@ module.exports = function (io) {
       }
       else{
       // else
-      let updateResult = await gameServce.updateGoods(data.userId, data.goods);
+      let updateResult = await gameService.updateGoods(data.userId, data.goods);
       io.to(data.roomId).emit('useActionSpace', updateResult);
       // io.sockets.emit('useActionSpace', updateResult);
       }
