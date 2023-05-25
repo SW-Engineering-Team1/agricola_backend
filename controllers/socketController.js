@@ -14,38 +14,60 @@ module.exports = function (io) {
 
     socket.on('useActionSpace', useActionSpace);
 
-    async function useActionSpace (data){
-      if(data.actionName == 'Major Improvement'){
-        let isExist = await gameService.isExistFacilityCard(data.goods[0].name, data.userId, data.roomId);
-        if(isExist === "main"){
-          
+    async function useActionSpace(data) {
+      if (data.actionName == 'Major Improvement') {
+        let isExist = await gameService.isExistFacilityCard(
+          data.goods[0].name,
+          data.userId,
+          data.roomId
+        );
+        if (isExist === 'main') {
           // 총 emit 두 개(게임 방의 주요설비 판 내용 + 플레이어의 주요설비 리스트)
-          await gameService.updateFacilityCard(data.goods[0].name, data.userId, data.roomId, isExist);
+          await gameService.updateFacilityCard(
+            data.goods[0].name,
+            data.userId,
+            data.roomId,
+            isExist
+          );
 
-          // 주요설비 관련 내용 emit 
-          let updatedFacilityList = await gameService.getMainFacilityCards(data.roomId);
+          // 주요설비 관련 내용 emit
+          let updatedFacilityList = await gameService.getMainFacilityCards(
+            data.roomId
+          );
           io.to(data.roomId).emit('useActionSpace', updatedFacilityList);
 
           // 주요설비를 사용한 플레이어의 상태 emit 필요
-          let updatedPlayer = await gameService.getPlayerStatus(data.userId, data.roomId);
+          let updatedPlayer = await gameService.getPlayerStatus(
+            data.userId,
+            data.roomId
+          );
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
-        } else if(isExist === "sub"){
+        } else if (isExist === 'sub') {
           // 총 emit 한 개(플레이어의 보조설비 리스트)
 
           // 보조설비를 사용한 플레이어의 상태 emit 필요
-          await gameService.updateFacilityCard(data.goods[0].name, data.userId, data.roomId, isExist);
-          let updatedPlayer = await gameService.getPlayerStatus(data.userId, data.roomId);
+          await gameService.updateFacilityCard(
+            data.goods[0].name,
+            data.userId,
+            data.roomId,
+            isExist
+          );
+          let updatedPlayer = await gameService.getPlayerStatus(
+            data.userId,
+            data.roomId
+          );
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
-        }
-        else{
+        } else {
           response(baseResponse.NOT_ENOUGHDATA);
         }
-      }
-      else{
-      // else
-      let updateResult = await gameService.updateGoods(data.userId, data.goods);
-      io.to(data.roomId).emit('useActionSpace', updateResult);
-      // io.sockets.emit('useActionSpace', updateResult);
+      } else {
+        // else
+        let updateResult = await gameService.updateGoods(
+          data.userId,
+          data.goods
+        );
+        io.to(data.roomId).emit('useActionSpace', updateResult);
+        // io.sockets.emit('useActionSpace', updateResult);
       }
     }
 
