@@ -59,7 +59,7 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
-  isExistMajorImprovementCard: async function (goodsName, userId, roomId) {
+  isExistFacilityCard: async function (goodsName, userId, roomId) {
     try {
       const remainedMainFacilityCard = await GameRooms.findOne({
         where: {
@@ -89,8 +89,7 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
-
-  updateMajorImprovementCard: async function (goodsName, userId, roomId, type) {
+  updateFacilityCard: async function (goodsName, userId, roomId, type) {
     if (type === "main") {
       try {
         const gameRoom = await GameRooms.findOne({
@@ -105,7 +104,7 @@ module.exports = {
         });
         const updatedRemainedMainFacilityCard = gameRoom.dataValues.remainedMainFacilityCard.filter((card) => card != goodsName);
         const updatedUsedMainFacilityCard = gameStatus.dataValues.usedMainFacilityCard.concat(goodsName);
-        await GameRooms.update(
+        let tmp = await GameRooms.update(
           {
             remainedMainFacilityCard: updatedRemainedMainFacilityCard,
           },
@@ -115,6 +114,8 @@ module.exports = {
             },
           }
         )
+        // return 1
+        // console.log(tmp)
         await GameStatus.update(
           {
             usedMainFacilityCard: updatedUsedMainFacilityCard,
@@ -168,5 +169,34 @@ module.exports = {
         return errResponse(baseResponse.DB_ERROR);
       }
     }
+  },
+  getMainFacilityCards: async function(roomId) {
+    try {
+      const gameRoom = await GameRooms.findOne({
+        where: {
+          room_id: roomId,
+        }
+      })
+      return gameRoom.dataValues
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
+  getPlayerStatus: async function (userId, roomId) {
+    try {
+      let playerDetail = await GameStatus.findOne({
+        where: {
+          userId,
+          roomId,
+        },
+      });
+      return playerDetail.dataValues;
+    } catch(err){
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
   }
+
+
 };
