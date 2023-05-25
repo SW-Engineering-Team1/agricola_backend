@@ -10,34 +10,23 @@ module.exports = function (io) {
     // socket.on('getRooms', getRooms);
     socket.on('joinRoom', joinRoom);
     socket.on('exitRoom', exitRoom);
+    socket.on('patchGameStatus', patchGameStatus);
 
     socket.on('useActionSpace', useActionSpace);
-    // data
-    // {
-    //   "actionName": "액션이름",
-    //   "userId": "플레이어 아이디",
-    //   "roomId": 방 번호,
-    //   "goods" : [
-    //     {
-    //       "name": "자원이름",
-    //       "num": 자원개수,
-    //       "isAdd": true,
-    //     }
-    //   ]
-    // }
 
     async function useActionSpace (data){
       if(data.actionName == 'Major Improvement'){
-        let isExist = await gameService.isExistMajorImprovementCard(data.goods[0].name, data.userId);
-        if(isExist){
-          console.log("있음")
-        } else{
-          console.log("없음")
+        let isExist = await gameService.isExistMajorImprovementCard(data.goods[0].name, data.userId, data.roomId);
+        if(isExist === "main"){
+          await gameService.updateMajorImprovementCard(data.goods[0].name, data.userId, data.roomId, isExist);
+        } else if(isExist === "sub"){
+          await gameService.updateMajorImprovementCard(data.goods[0].name, data.userId, data.roomId, isExist);
+        }
+        else{
+          response(baseResponse.NOT_ENOUGHDATA);
         }
       }
     }
-
-    socket.on('patchGameStatus', patchGameStatus);
 
     async function patchGameStatus(data) {
       try {

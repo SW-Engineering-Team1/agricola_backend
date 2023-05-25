@@ -118,10 +118,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         defaultValue: [],
       },
-      remainedMainFacilityCard: {
-        type: DataTypes.JSON,
-        defaultValue: [],
-      },
       usedMainFacilityCard: {
         type: DataTypes.JSON,
         defaultValue: [],

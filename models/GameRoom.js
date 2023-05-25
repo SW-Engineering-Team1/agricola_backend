@@ -28,6 +28,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING(20),
         allowNull: false,
       },
+      remainedMainFacilityCard: {
+        type: DataTypes.JSON,
+        defaultValue: [],
+      },
     },
     {
       timestamps: false,
