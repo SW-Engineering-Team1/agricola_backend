@@ -2,6 +2,7 @@ const baseResponse = require('../config/baseResponseStatus');
 const { response, errResponse } = require('../config/response');
 const roomService = require('../services/roomService');
 const gameService = require('../services/gameService');
+const utilities = require('../modules/utility');
 
 module.exports = function (io) {
   io.on('connection', function (socket) {
@@ -45,16 +46,13 @@ module.exports = function (io) {
         } else if (isExist === 'sub') {
           // 총 emit 한 개(플레이어의 보조설비 리스트)
           // 보조설비를 사용한 플레이어의 상태 emit 필요
-          await gameService.updateFacilityCard(
-            data.goods[0].name,
-            data.userId,
-            data.roomId,
-            isExist
-          );
-          let updatedPlayer = await gameService.getPlayerStatus(
-            data.userId,
-            data.roomId
-          );
+          // await gameService.updateFacilityCard(
+          //   data.goods[0].name,
+          //   data.userId,
+          //   data.roomId,
+          //   isExist
+          // );
+          let updatedPlayer = await utilities.addSubFacility(data.goods, data.userId, data.roomId, isExist);
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
         }
         else {
@@ -63,28 +61,12 @@ module.exports = function (io) {
       }
       // 씨뿌리기 이벤트
       else if (data.actionName === "Grain Utilization") {
-        let tmp = JSON.parse(JSON.stringify(data.goods));
-        tmp[0].name = tmp[0].name + "OnStorage";
-        gameService.updateGoods(data.userId, tmp);
-
-        data.goods[0].name = data.goods[0].name + "Doing"
-        data.goods[0].isAdd = true;
-
-        let updateResult = gameService.updateGoods(data.userId, data.goods);
+        let updateResult = await utilities.sowSeed(data.userId, data.goods);
         io.to(data.roomId).emit('useActionSpace', updateResult);
       }
       // 빵 굽기 이벤트
       else if (data.actionName === "Bake Bread") {
-        
-        data.goods[0].name = data.goods[0].name + "OnStorage";
-        await gameService.updateGoods(data.userId, data.goods);
-
-        data.goods[0].name = "food";
-        data.goods[0].num = parseInt(data.goods[0].num) * 5;
-        data.goods[0].isAdd = true;
-
-
-        let updateResult = await gameService.updateGoods(data.userId, data.goods);
+        let updateResult = await utilities.bakeBread(data.userId, data.goods);
         io.to(data.roomId).emit('useActionSpace', updateResult);
       }
       else if (data.actionName === 'Meeting Place') {
