@@ -46,12 +46,6 @@ module.exports = function (io) {
         } else if (isExist === 'sub') {
           // 총 emit 한 개(플레이어의 보조설비 리스트)
           // 보조설비를 사용한 플레이어의 상태 emit 필요
-          // await gameService.updateFacilityCard(
-          //   data.goods[0].name,
-          //   data.userId,
-          //   data.roomId,
-          //   isExist
-          // );
           let updatedPlayer = await utilities.addSubFacility(data.goods, data.userId, data.roomId, isExist);
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
         }
