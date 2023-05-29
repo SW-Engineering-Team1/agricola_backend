@@ -2,6 +2,7 @@ const baseResponse = require('../config/baseResponseStatus');
 const { response, errResponse } = require('../config/response');
 const roomService = require('../services/roomService');
 const gameService = require('../services/gameService');
+const utilities = require('../modules/utility');
 
 module.exports = function (io) {
   io.on('connection', function (socket) {
@@ -44,23 +45,25 @@ module.exports = function (io) {
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
         } else if (isExist === 'sub') {
           // 총 emit 한 개(플레이어의 보조설비 리스트)
-
           // 보조설비를 사용한 플레이어의 상태 emit 필요
-          await gameService.updateFacilityCard(
-            data.goods[0].name,
-            data.userId,
-            data.roomId,
-            isExist
-          );
-          let updatedPlayer = await gameService.getPlayerStatus(
-            data.userId,
-            data.roomId
-          );
+          let updatedPlayer = await utilities.addSubFacility(data.goods, data.userId, data.roomId, isExist);
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
-        } else {
+        }
+        else {
           response(baseResponse.NOT_ENOUGHDATA);
         }
-      } else if (data.actionName === 'Meeting Place') {
+      }
+      // 씨뿌리기 이벤트
+      else if (data.actionName === "Grain Utilization") {
+        let updateResult = await utilities.sowSeed(data.userId, data.goods);
+        io.to(data.roomId).emit('useActionSpace', updateResult);
+      }
+      // 빵 굽기 이벤트
+      else if (data.actionName === "Bake Bread") {
+        let updateResult = await utilities.bakeBread(data.userId, data.goods);
+        io.to(data.roomId).emit('useActionSpace', updateResult);
+      }
+      else if (data.actionName === 'Meeting Place') {
         // 시작 플레이어 되기 그리고 보조 설비 1개 내려놓기
         if (data.goods.length === 2) {
           // 시작 플레이어 되기
