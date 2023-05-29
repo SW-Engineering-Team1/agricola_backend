@@ -1,11 +1,15 @@
 const gameService = require('../services/gameService');
 
 module.exports = {
-	sowSeed: function (userId, goodsList) {
+	sowSeed: async function (userId, goodsList) {
 		let tmp = JSON.parse(JSON.stringify(goodsList));
 		tmp[0].name = tmp[0].name + "OnStorage";
 
-		gameService.updateGoods(userId, tmp);
+		let updateResult  = await gameService.updateGoods(userId, tmp);
+		if(updateResult.isSuccess == false){
+			return updateResult;
+		}
+		// console.log(abc.isSuccess);
 
 		goodsList[0].name = goodsList[0].name + "Doing"
 		goodsList[0].isAdd = true;
@@ -15,7 +19,10 @@ module.exports = {
 
 	bakeBread: async function (userId, goodsList) {
 		goodsList[0].name = goodsList[0].name + "OnStorage";
-		gameService.updateGoods(userId, goodsList);
+		let updateResult = await gameService.updateGoods(userId, goodsList);
+		if(updateResult.isSuccess == false){
+			return updateResult;
+		}
 
 		goodsList[0].name = "food";
 		goodsList[0].num = parseInt(goodsList[0].num) * 5;
