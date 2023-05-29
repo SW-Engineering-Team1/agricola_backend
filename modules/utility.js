@@ -44,6 +44,33 @@ module.exports = {
 			userId,
 			roomId
 		);
+	},
+	fixHouse: async function (userId, roomId, goodsList) {
+		// goodsList[0]: 개조할 집, goodsList[1]: 갈대 개수, goodsList[2]: 개조하기 위해 필요한 자원
+		let getPlayerStatus = await gameService.getPlayerStatus(userId, roomId);
+        let playerHouse;
+        let updateList = [goodsList[0], goodsList[1],goodsList[2]];
+        if(goodsList[0].name === 'sandHouse'){
+          playerHouse = getPlayerStatus.woodHouse;
+          updateList[3] = JSON.parse(`{"name": "woodHouse", "num": "${playerHouse}", "isAdd": false}`);
+        }
+        else if(goodsList[0].name === 'stoneHouse'){
+          playerHouse = getPlayerStatus.sandHouse
+          updateList[3] = JSON.parse(`{"name": "sandHouse", "num": "${playerHouse}", "isAdd": false}`);
+        }
+        else{
+          io.to(roomId).emit('useActionSpace', baseResponse.BAD_REQUEST);
+        }
+
+        if(playerHouse != goodsList[0].num || goodsList[1].num != 1 || goodsList[2].num != goodsList[0].num){
+          io.to(roomId).emit('useActionSpace', baseResponse.NOT_ENOUGHDATA);
+          console.log("error");
+          return ;
+        }
+
+        let updateResult = await gameService.updateGoods(userId, updateList);
+        
+		return updateResult;
 	}
 
 };

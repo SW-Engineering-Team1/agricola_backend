@@ -95,7 +95,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       woodHouse: {
         type: DataTypes.INTEGER,
-        defaultValue: 0,
+        defaultValue: 2,
       },
       sandHouse: {
         type: DataTypes.INTEGER,
