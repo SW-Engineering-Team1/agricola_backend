@@ -241,26 +241,30 @@ module.exports = {
     }
   },
   canAddFamily: async function (userId, roomId) {
-    try{
+    try {
       const playerDetail = await GameStatus.findOne({
         where: {
           userId,
           roomId,
         },
       });
-      const currentFamily = playerDetail.dataValues.family + playerDetail.dataValues.baby;
-      const maxFamily = playerDetail.dataValues.sandHouse + playerDetail.dataValues.stoneHouse + playerDetail.dataValues.woodHouse;
-      if(maxFamily > currentFamily){
+      const currentFamily =
+        playerDetail.dataValues.family + playerDetail.dataValues.baby;
+      const maxFamily =
+        playerDetail.dataValues.sandHouse +
+        playerDetail.dataValues.stoneHouse +
+        playerDetail.dataValues.woodHouse;
+      if (maxFamily > currentFamily) {
         return true;
       }
       return false;
-    } catch(err){
+    } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
     }
   },
   hasEnoughFamily: async function (userId, roomId) {
-    try{
+    try {
       const playerDetail = await GameStatus.findOne({
         where: {
           userId,
@@ -268,10 +272,10 @@ module.exports = {
         },
       });
       const remainedFamily = playerDetail.dataValues.remainedFamily;
-      return remainedFamily === 0? false : true;
-    } catch (err){
+      return remainedFamily === 0 ? false : true;
+    } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
     }
-  }
+  },
 };
