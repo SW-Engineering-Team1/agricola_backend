@@ -37,6 +37,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      fence: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
       sand: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
