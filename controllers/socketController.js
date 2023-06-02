@@ -288,7 +288,38 @@ module.exports = function (io) {
             baseResponse.NOT_ENOUGHDATA
           );
         }
-      } else {
+      } 
+      // 밭 농사하기
+      else if (data.actionName === 'Cultivation') {
+        let updateResult = await gameService.updateGoods(data.userId, [data.goods[0]]);
+        if (updateResult.isSuccess == false) {
+          io.to(data.roomId).emit('useActionSpace', updateResult);
+          return;
+        }
+        if (data.goods.length > 1) {
+          updateResult = await utilities.sowSeed(data.userId, [data.goods[1]]);
+          io.to(data.roomId).emit('useActionSpace', updateResult);
+          return;
+        }
+        io.to(data.roomId).emit('useActionSpace', updateResult);
+      }
+      // 농장 개조하기
+      else if(data.actionName === 'Farm redevelopment'){
+        let updateResult = await utilities.fixHouse(data.userId, data.roomId, data.goods);
+        if (updateResult.isSuccess == false) {
+          io.to(roomId).emit('useActionSpace', updateResult);
+          return;
+        }
+        // 그리고/또는 울타리 치기
+        if(data.goods.length > 3){
+          data.goods.splice(0,3);
+          data.goods[2].name = 'field';
+          data.goods[2].isAdd = true;
+          updateResult = await gameService.updateGoods(data.userId, data.goods);
+          io.to(data.roomId).emit('useActionSpace', updateResult);
+        }
+      }
+      else {
         // else
         let updateResult = await gameService.updateGoods(
           data.userId,
