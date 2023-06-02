@@ -73,7 +73,7 @@ module.exports = function (io) {
         // 시작 플레이어 되기 그리고 보조 설비 1개 내려놓기
         if (data.goods.length === 2) {
           // 시작 플레이어 되기
-          let updateOrderResult = await gameService.updateOrder(
+          let updateOrderResult = await gameService.updateNextOrder(
             data.roomId,
             data.userId
           );

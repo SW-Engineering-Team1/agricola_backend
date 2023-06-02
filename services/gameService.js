@@ -209,7 +209,7 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
-  updateOrder: async function (roomId, userId) {
+  updateNextOrder: async function (roomId, userId) {
     try {
       await GameStatus.update(
         {
