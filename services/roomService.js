@@ -273,4 +273,16 @@ module.exports = {
       return false;
     }
   },
+  findUserListByRoomId: async (roomId) => {
+    let findUserResult = await UserGameRoom.findAll({
+      where: {
+        room_id: roomId,
+      },
+    });
+    let userList = [];
+    for (let result of findUserResult) {
+      userList.push(result.dataValues.user_id);
+    }
+    return userList;
+  },
 };
