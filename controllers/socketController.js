@@ -13,6 +13,7 @@ module.exports = function (io) {
     socket.on('exitRoom', exitRoom);
     socket.on('patchGameStatus', patchGameStatus);
     socket.on('startRound', startRound);
+    socket.on('endRound', endRound);
     socket.on('endCycle', endCycle);
     socket.on('startGame', startGame);
 
@@ -628,6 +629,10 @@ module.exports = function (io) {
       //   updateOrderResult,
       //   'Small Farmer': updateResult,
       // });
+    }
+
+    async function endRound(data) {
+      io.to(data.roomId).emit('endRound', 'endRound');
     }
   });
 };
