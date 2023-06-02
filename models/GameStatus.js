@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
   const GameStatus = sequelize.define(
-    'GameStatus',
+    'GameStatuses',
     {
       // roomId: {
       //   type: DataTypes.INTEGER,

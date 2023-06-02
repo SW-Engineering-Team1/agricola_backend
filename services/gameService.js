@@ -273,5 +273,86 @@ module.exports = {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
     }
+  },
+  harvestCrop: async function (userId, roomId){
+    let playerDetail = await GameStatus.findOne({
+      where: {
+        userId: userId,
+        roomId,
+      },
+    });
+    let data = [];
+    data.push({name: 'vegeOnField', num: playerDetail.dataValues.vegeOnField, isAdd: false});
+    data.push({name: 'vegeOnStorage', num: playerDetail.dataValues.vegeOnField, isAdd: true});
+    data.push({name: 'grainOnField', num: playerDetail.dataValues.grainOnField, isAdd: false});
+    data.push({name: 'grainOnStorage', num: playerDetail.dataValues.grainOnField, isAdd: true});
+
+    try{
+      let result = await this.updateGoods(userId, data);
+      return response(baseResponse.SUCCESS, result);
+    }catch (err){
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
+  payFood: async function (userId, roomId){
+    let playerDetail = await GameStatus.findOne({
+      where: {
+        userId: userId,
+        roomId,
+      },
+    });
+    let pay = playerDetail.dataValues.family * 2 + playerDetail.dataValues.baby * 1
+    if (pay > playerDetail.dataValues.food){
+      let begging = pay - playerDetail.dataValues.food;
+      let data = [];
+      data.push({name: 'numOfBeggingToken', num: begging, isAdd: true});
+      data.push({name: 'food', num: playerDetail.dataValues.food, isAdd: false});
+      try{
+        let result = await this.updateGoods(userId, data);
+        return response(baseResponse.SUCCESS, result);
+      } catch(err){
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR);
+      }
+    }
+    else{
+      let data = [];
+      data.push({name: 'food', num: pay, isAdd: false});
+      try{
+        let result = await this.updateGoods(userId, data);
+        return response(baseResponse.SUCCESS, result);
+      }catch (err){
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR);
+      }
+    }
+  },
+  breedAnimal: async function (userId, roomId){
+    let playerDetail = await GameStatus.findOne({
+      where: {
+        userId: userId,
+        roomId,
+      },
+    });
+    let data = [];
+    if(playerDetail.dataValues.sheep > 1){
+      data.push({name: 'sheep', num: 1, isAdd: true});
+    }
+    if(playerDetail.dataValues.pig > 1){
+      data.push({name: 'pig', num: 1, isAdd: true});
+    }
+    if(playerDetail.dataValues.cow > 1){
+      data.push({name: 'cow', num: 1, isAdd: true});
+    }
+
+    // console.log(data)
+    try{
+      let result = await this.updateGoods(userId, data);
+      return response(baseResponse.SUCCESS, result);
+    }catch (err){
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
   }
 };
