@@ -4,6 +4,7 @@ const models = require('../models');
 const GameStatus = models.game_status;
 const GameRooms = models.gameroom;
 const sequelize = require('sequelize');
+const roomService = require('../services/roomService');
 const Op = sequelize.Op;
 
 module.exports = {
@@ -329,7 +330,7 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
-  harvestCrop: async function (userId, roomId){
+  harvestCrop: async function (userId, roomId) {
     let playerDetail = await GameStatus.findOne({
       where: {
         userId: userId,
@@ -337,53 +338,73 @@ module.exports = {
       },
     });
     let data = [];
-    data.push({name: 'vegeOnField', num: playerDetail.dataValues.vegeOnField, isAdd: false});
-    data.push({name: 'vegeOnStorage', num: playerDetail.dataValues.vegeOnField, isAdd: true});
-    data.push({name: 'grainOnField', num: playerDetail.dataValues.grainOnField, isAdd: false});
-    data.push({name: 'grainOnStorage', num: playerDetail.dataValues.grainOnField, isAdd: true});
+    data.push({
+      name: 'vegeOnField',
+      num: playerDetail.dataValues.vegeOnField,
+      isAdd: false,
+    });
+    data.push({
+      name: 'vegeOnStorage',
+      num: playerDetail.dataValues.vegeOnField,
+      isAdd: true,
+    });
+    data.push({
+      name: 'grainOnField',
+      num: playerDetail.dataValues.grainOnField,
+      isAdd: false,
+    });
+    data.push({
+      name: 'grainOnStorage',
+      num: playerDetail.dataValues.grainOnField,
+      isAdd: true,
+    });
 
-    try{
+    try {
       let result = await this.updateGoods(userId, data);
       return response(baseResponse.SUCCESS, result);
-    }catch (err){
+    } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
     }
   },
-  payFood: async function (userId, roomId){
+  payFood: async function (userId, roomId) {
     let playerDetail = await GameStatus.findOne({
       where: {
         userId: userId,
         roomId,
       },
     });
-    let pay = playerDetail.dataValues.family * 2 + playerDetail.dataValues.baby * 1
-    if (pay > playerDetail.dataValues.food){
+    let pay =
+      playerDetail.dataValues.family * 2 + playerDetail.dataValues.baby * 1;
+    if (pay > playerDetail.dataValues.food) {
       let begging = pay - playerDetail.dataValues.food;
       let data = [];
-      data.push({name: 'numOfBeggingToken', num: begging, isAdd: true});
-      data.push({name: 'food', num: playerDetail.dataValues.food, isAdd: false});
-      try{
+      data.push({ name: 'numOfBeggingToken', num: begging, isAdd: true });
+      data.push({
+        name: 'food',
+        num: playerDetail.dataValues.food,
+        isAdd: false,
+      });
+      try {
         let result = await this.updateGoods(userId, data);
         return response(baseResponse.SUCCESS, result);
-      } catch(err){
+      } catch (err) {
         console.log(err);
         return errResponse(baseResponse.DB_ERROR);
       }
-    }
-    else{
+    } else {
       let data = [];
-      data.push({name: 'food', num: pay, isAdd: false});
-      try{
+      data.push({ name: 'food', num: pay, isAdd: false });
+      try {
         let result = await this.updateGoods(userId, data);
         return response(baseResponse.SUCCESS, result);
-      }catch (err){
+      } catch (err) {
         console.log(err);
         return errResponse(baseResponse.DB_ERROR);
       }
     }
   },
-  breedAnimal: async function (userId, roomId){
+  breedAnimal: async function (userId, roomId) {
     let playerDetail = await GameStatus.findOne({
       where: {
         userId: userId,
@@ -391,23 +412,158 @@ module.exports = {
       },
     });
     let data = [];
-    if(playerDetail.dataValues.sheep > 1){
-      data.push({name: 'sheep', num: 1, isAdd: true});
+    if (playerDetail.dataValues.sheep > 1) {
+      data.push({ name: 'sheep', num: 1, isAdd: true });
     }
-    if(playerDetail.dataValues.pig > 1){
-      data.push({name: 'pig', num: 1, isAdd: true});
+    if (playerDetail.dataValues.pig > 1) {
+      data.push({ name: 'pig', num: 1, isAdd: true });
     }
-    if(playerDetail.dataValues.cow > 1){
-      data.push({name: 'cow', num: 1, isAdd: true});
+    if (playerDetail.dataValues.cow > 1) {
+      data.push({ name: 'cow', num: 1, isAdd: true });
     }
 
     // console.log(data)
-    try{
+    try {
       let result = await this.updateGoods(userId, data);
       return response(baseResponse.SUCCESS, result);
-    }catch (err){
+    } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
     }
-  }
+  },
+  startGame: async function (roomId, userId) {
+    let isHost = await roomService.checkIsHost(roomId, userId);
+    if (isHost) {
+      try {
+        await GameStatus.create({
+          roomId,
+          UserId: userId,
+          isMyTurn: true,
+          order: 1,
+          nextOrder: 1,
+          remainedJobCard: [
+            '소규모 농부',
+            '지붕 다지는 사람',
+            '마부',
+            '사제',
+            '유기농부',
+            '잡화상인',
+            '버섯 따는 사람',
+          ],
+          usedJobCard: [],
+          usedMainFacilityCard: [],
+          remainedSubFacilityCard: [
+            '올가미 밧줄',
+            '여물통',
+            '연못 오두막',
+            '거대 농장',
+            '흙판',
+            '침실',
+          ],
+          usedSubFacilityCard: [],
+        });
+      } catch (err) {
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR);
+      }
+    } else {
+      try {
+        await GameStatus.create({
+          roomId,
+          UserId: userId,
+          isMyTurn: false,
+          order: 2,
+          nextOrder: 2,
+          remainedJobCard: [
+            '상담가',
+            '가마 떼는 사람',
+            '재산 관리인',
+            '큰낫 일꾼',
+            '외양간 건축가',
+            '양 보행자',
+            '학자',
+          ],
+          usedJobCard: [],
+          usedMainFacilityCard: [],
+          remainedSubFacilityCard: [
+            '다진 흙',
+            '우시장',
+            '돌 집게',
+            '벽난로 선반',
+            '양모',
+            '담요',
+            '병',
+            '베틀',
+          ],
+          usedSubFacilityCard: [],
+        });
+      } catch (err) {
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR);
+      }
+    }
+    try {
+      await GameRooms.update(
+        {
+          status: 'STARTED',
+        },
+        {
+          where: {
+            room_id: roomId,
+          },
+        }
+      );
+      return response(baseResponse.SUCCESS);
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
+  endTurn: async function (roomId, userId) {
+    let gamestatus = await GameStatus.findAll({
+      where: {
+        roomId,
+      },
+    });
+
+    gamestatus.forEach(async (element) => {
+      if (element.dataValues.UserId === userId) {
+        await GameStatus.update(
+          {
+            isMyTurn: false,
+          },
+          {
+            where: {
+              roomId,
+              UserId: userId,
+            },
+          }
+        );
+      } else {
+        await GameStatus.update(
+          {
+            isMyTurn: true,
+          },
+          {
+            where: {
+              roomId,
+              UserId: element.dataValues.UserId,
+            },
+          }
+        );
+      }
+    });
+
+    try {
+      let gamestatus = await GameStatus.findAll({
+        where: {
+          roomId,
+        },
+      });
+      return response(baseResponse.SUCCESS, gamestatus);
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
 };
