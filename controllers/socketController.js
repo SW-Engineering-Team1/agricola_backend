@@ -68,7 +68,9 @@ module.exports = function (io) {
       else if (data.actionName === 'Bake Bread') {
         let updateResult = await utilities.bakeBread(data.userId, data.goods);
         io.to(data.roomId).emit('useActionSpace', updateResult);
-      } else if (data.actionName === 'Meeting Place') {
+      }
+      //회합 장소 이벤트
+      else if (data.actionName === 'Meeting Place') {
         // 시작 플레이어 되기 그리고 보조 설비 1개 내려놓기
         if (data.goods.length === 2) {
           // 시작 플레이어 되기
@@ -94,7 +96,10 @@ module.exports = function (io) {
               'sub'
             );
             if (cardResult.isSuccess === false) {
-              io.to(data.roomId).emit('useActionSpace', cardResult);
+              io.to(data.roomId).emit(
+                'useActionSpace',
+                baseResponse.INVALID_CARD_NAME
+              );
               return;
             }
           } else {
@@ -118,7 +123,10 @@ module.exports = function (io) {
               data.userId
             );
             if (updateOrderResult.isSuccess === false) {
-              io.to(data.roomId).emit('useActionSpace', updateOrderResult);
+              io.to(data.roomId).emit(
+                'useActionSpace',
+                baseResponse.BAD_REQUEST
+              );
               return;
             }
           }
@@ -137,7 +145,10 @@ module.exports = function (io) {
                 'sub'
               );
               if (cardResult.isSuccess === false) {
-                io.to(data.roomId).emit('useActionSpace', cardResult);
+                io.to(data.roomId).emit(
+                  'useActionSpace',
+                  baseResponse.INVALID_CARD_NAME
+                );
                 return;
               }
             } else {
@@ -145,7 +156,7 @@ module.exports = function (io) {
                 'useActionSpace',
                 baseResponse.INVALID_CARD_NAME
               );
-              io.sockets.emit('useActionSpace', baseResponse.INVALID_CARD_NAME);
+              return;
             }
           }
           let updateResult = await gameService.getPlayerStatus(
@@ -153,7 +164,7 @@ module.exports = function (io) {
             data.roomId
           );
           io.to(data.roomId).emit('useActionSpace', updateResult);
-          io.sockets.emit('useActionSpace', updateResult);
+          // io.sockets.emit('useActionSpace', updateResult);
         }
       }
       // 기본 가족 늘리기
@@ -288,6 +299,17 @@ module.exports = function (io) {
             baseResponse.NOT_ENOUGHDATA
           );
         }
+      } else if (data.actionName == 'Lessons') {
+        let result = await gameService.updateJobCard(
+          data.goods[0].name,
+          data.roomId,
+          data.userId
+        );
+        let updateResult = await gameService.getPlayerStatus(
+          data.userId,
+          data.roomId
+        );
+        io.sockets.emit('useActionSpace', updateResult);
       } 
       // 밭 농사하기
       else if (data.actionName === 'Cultivation') {
