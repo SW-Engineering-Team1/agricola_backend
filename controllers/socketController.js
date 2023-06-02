@@ -48,24 +48,27 @@ module.exports = function (io) {
         } else if (isExist === 'sub') {
           // 총 emit 한 개(플레이어의 보조설비 리스트)
           // 보조설비를 사용한 플레이어의 상태 emit 필요
-          let updatedPlayer = await utilities.addSubFacility(data.goods, data.userId, data.roomId, isExist);
+          let updatedPlayer = await utilities.addSubFacility(
+            data.goods,
+            data.userId,
+            data.roomId,
+            isExist
+          );
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
-        }
-        else {
+        } else {
           response(baseResponse.NOT_ENOUGHDATA);
         }
       }
       // 씨뿌리기 이벤트
-      else if (data.actionName === "Grain Utilization") {
+      else if (data.actionName === 'Grain Utilization') {
         let updateResult = await utilities.sowSeed(data.userId, data.goods);
         io.to(data.roomId).emit('useActionSpace', updateResult);
       }
       // 빵 굽기 이벤트
-      else if (data.actionName === "Bake Bread") {
+      else if (data.actionName === 'Bake Bread') {
         let updateResult = await utilities.bakeBread(data.userId, data.goods);
         io.to(data.roomId).emit('useActionSpace', updateResult);
-      }
-      else if (data.actionName === 'Meeting Place') {
+      } else if (data.actionName === 'Meeting Place') {
         // 시작 플레이어 되기 그리고 보조 설비 1개 내려놓기
         if (data.goods.length === 2) {
           // 시작 플레이어 되기
@@ -150,16 +153,21 @@ module.exports = function (io) {
             data.roomId
           );
           io.to(data.roomId).emit('useActionSpace', updateResult);
-          // io.sockets.emit('useActionSpace', updateResult);
+          io.sockets.emit('useActionSpace', updateResult);
         }
       }
       // 기본 가족 늘리기
       else if (data.actionName === 'Basic Wish for Children') {
-        let hasEnoughFamily = await gameService.hasEnoughFamily(data.userId, data.roomId);
-        let canAddFamily = await gameService.canAddFamily(data.userId, data.roomId);
+        let hasEnoughFamily = await gameService.hasEnoughFamily(
+          data.userId,
+          data.roomId
+        );
+        let canAddFamily = await gameService.canAddFamily(
+          data.userId,
+          data.roomId
+        );
         if (canAddFamily && hasEnoughFamily) {
-
-          data.goods[0].name = 'baby'
+          data.goods[0].name = 'baby';
 
           let goodsList = [];
 
@@ -170,22 +178,35 @@ module.exports = function (io) {
           goodsList.push(data.goods[0]);
           goodsList.push(tmp[0]);
 
-          let updateResult = await gameService.updateGoods(data.userId, goodsList);
+          let updateResult = await gameService.updateGoods(
+            data.userId,
+            goodsList
+          );
           if (data.goods.length > 1) {
-            let updatedPlayer = await utilities.addSubFacility([data.goods[1]], data.userId, data.roomId, 'sub');
+            let updatedPlayer = await utilities.addSubFacility(
+              [data.goods[1]],
+              data.userId,
+              data.roomId,
+              'sub'
+            );
             io.to(data.roomId).emit('useActionSpace', updatedPlayer);
-          }
-          else {
+          } else {
             io.to(data.roomId).emit('useActionSpace', updateResult);
           }
-        }
-        else {
-          io.to(data.roomId).emit('useActionSpace', baseResponse.NOT_ENOUGHDATA);
+        } else {
+          io.to(data.roomId).emit(
+            'useActionSpace',
+            baseResponse.NOT_ENOUGHDATA
+          );
         }
       }
       // 집 개조하기
-      else if (data.actionName === 'House Redevelopment') {
-        let updateResult = await utilities.fixHouse(data.userId, data.roomId, data.goods);
+      else if (data.actionName === 'Houser Redevelopment') {
+        let updateResult = await utilities.fixHouse(
+          data.userId,
+          data.roomId,
+          data.goods
+        );
         if (updateResult.isSuccess == false) {
           io.to(roomId).emit('useActionSpace', updateResult);
           return;
@@ -221,23 +242,32 @@ module.exports = function (io) {
           } else if (isExist === 'sub') {
             // 총 emit 한 개(플레이어의 보조설비 리스트)
             // 보조설비를 사용한 플레이어의 상태 emit 필요
-            let updatedPlayer = await utilities.addSubFacility([data.goods[3]], data.userId, data.roomId, isExist);
+            let updatedPlayer = await utilities.addSubFacility(
+              [data.goods[3]],
+              data.userId,
+              data.roomId,
+              isExist
+            );
             io.to(data.roomId).emit('useActionSpace', updatedPlayer);
-          }
-          else {
+          } else {
             response(baseResponse.NOT_ENOUGHDATA);
           }
-        }
-        else {
-          let updatedPlayer = await gameService.getPlayerStatus(data.userId, data.roomId);
+        } else {
+          let updatedPlayer = await gameService.getPlayerStatus(
+            data.userId,
+            data.roomId
+          );
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
         }
       }
       // 급한 가족 늘리기
       else if (data.actionName === 'Urgent Wish for Children') {
-        let hasEnoughFamily = await gameService.hasEnoughFamily(data.userId, data.roomId);
+        let hasEnoughFamily = await gameService.hasEnoughFamily(
+          data.userId,
+          data.roomId
+        );
         if (hasEnoughFamily) {
-          data.goods[0].name = 'baby'
+          data.goods[0].name = 'baby';
 
           let goodsList = [];
 
@@ -247,51 +277,25 @@ module.exports = function (io) {
 
           goodsList.push(data.goods[0]);
           goodsList.push(tmp[0]);
-          let updateResult = await gameService.updateGoods(data.userId, goodsList);
+          let updateResult = await gameService.updateGoods(
+            data.userId,
+            goodsList
+          );
           io.to(data.roomId).emit('useActionSpace', updateResult);
+        } else {
+          io.to(data.roomId).emit(
+            'useActionSpace',
+            baseResponse.NOT_ENOUGHDATA
+          );
         }
-        else {
-          io.to(data.roomId).emit('useActionSpace', baseResponse.NOT_ENOUGHDATA);
-        }
-      }
-      // 밭 농사하기
-      else if (data.actionName === 'Cultivation') {
-        let updateResult = await gameService.updateGoods(data.userId, [data.goods[0]]);
-        if (updateResult.isSuccess == false) {
-          io.to(data.roomId).emit('useActionSpace', updateResult);
-          return;
-        }
-        if (data.goods.length > 1) {
-          updateResult = await utilities.sowSeed(data.userId, [data.goods[1]]);
-          io.to(data.roomId).emit('useActionSpace', updateResult);
-          return;
-        }
-        io.to(data.roomId).emit('useActionSpace', updateResult);
-      }
-      // 농장 개조하기
-      else if (data.actionName === 'Farm redevelopment') {
-        let updateResult = await utilities.fixHouse(data.userId, data.roomId, data.goods);
-        if (updateResult.isSuccess == false) {
-          io.to(roomId).emit('useActionSpace', updateResult);
-          return;
-        }
-        // 그리고/또는 울타리 치기
-        if (data.goods.length > 3) {
-          data.goods.splice(0, 3);
-          data.goods[2].name = 'field';
-          data.goods[2].isAdd = true;
-          updateResult = await gameService.updateGoods(data.userId, data.goods);
-          io.to(data.roomId).emit('useActionSpace', updateResult);
-        }
-      }
-      else {
+      } else {
         // else
         let updateResult = await gameService.updateGoods(
           data.userId,
           data.goods
         );
         io.to(data.roomId).emit('useActionSpace', updateResult);
-        // io.sockets.emit('useActionSpace', updateResult);
+        io.sockets.emit('useActionSpace', updateResult);
       }
     }
 
