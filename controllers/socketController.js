@@ -287,6 +287,17 @@ module.exports = function (io) {
             baseResponse.NOT_ENOUGHDATA
           );
         }
+      } else if (data.actionName == 'Lessons') {
+        let result = await gameService.updateJobCard(
+          data.goods[0].name,
+          data.roomId,
+          data.userId
+        );
+        let updateResult = await gameService.getPlayerStatus(
+          data.userId,
+          data.roomId
+        );
+        io.sockets.emit('useActionSpace', updateResult);
       } else {
         // else
         let updateResult = await gameService.updateGoods(

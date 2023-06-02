@@ -278,4 +278,55 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
+  updateJobCard: async function (jobCardName, roomId, userId) {
+    try {
+      let getResult = await GameStatus.findOne({
+        attributes: ['remainedJobCard'],
+        where: {
+          roomId,
+          userId,
+        },
+      });
+      let remainedJobCard = getResult.dataValues.remainedJobCard;
+      if (!remainedJobCard.includes(jobCardName)) {
+        return errResponse(baseResponse.INVALID_CARD_NAME);
+      } else {
+        remainedJobCard = remainedJobCard.filter((card) => card != jobCardName);
+        await GameStatus.update(
+          {
+            remainedJobCard,
+          },
+          {
+            where: {
+              roomId,
+              userId,
+            },
+          }
+        );
+        let usedJobCard = await GameStatus.findOne({
+          attributes: ['usedJobCard'],
+          where: {
+            roomId,
+            userId,
+          },
+        });
+        usedJobCard = usedJobCard.dataValues.usedJobCard.concat(jobCardName);
+        await GameStatus.update(
+          {
+            usedJobCard: usedJobCard,
+          },
+          {
+            where: {
+              roomId,
+              userId,
+            },
+          }
+        );
+      }
+      return response(baseResponse.SUCCESS);
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
 };
