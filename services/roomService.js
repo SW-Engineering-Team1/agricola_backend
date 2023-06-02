@@ -10,10 +10,10 @@ let crypto = require('crypto');
 
 module.exports = {
   getGameStatus: async (roomId) => {
-    try { 
+    try {
       let gameStatus = await GameStatus.findAll({
         where: {
-          room_id: roomId,
+          roomId: roomId,
         },
       });
       return response(baseResponse.SUCCESS, gameStatus);
@@ -21,11 +21,11 @@ module.exports = {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
     }
-  },  
+  },
 
   patchGameStatus: async (data) => {
     // 기존 정보 파기
-    try{
+    try {
       await GameStatus.destroy({
         where: {
           room_id: data.roomId,
@@ -37,12 +37,12 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
 
-    try{
+    try {
       let gameStatus = await GameStatus.create({
         room_id: data.roomId,
         user_id: data.userId,
         is_my_turn: data.isMyTurn,
-        order_num: data.orderNum, 
+        order_num: data.orderNum,
         sheep_num: data.sheepNum,
         pig_num: data.pigNum,
         cow_num: data.cowNum,
@@ -73,7 +73,7 @@ module.exports = {
         remained_sub_facility_card: data.remainedSubFacilityCard,
         used_sub_facility_card: data.usedSubFacilityCard,
         num_of_begging_token: data.numOfBeggingToken,
-      });  
+      });
       return response(baseResponse.SUCCESS, gameStatus);
     } catch (err) {
       console.log(err);
@@ -98,7 +98,7 @@ module.exports = {
     }
   },
   checkIsHost: async (roomId, userId) => {
-    try{
+    try {
       let isHost = await GameRoom.findOne({
         where: {
           room_id: roomId,
@@ -109,8 +109,7 @@ module.exports = {
         return true;
       }
       return false;
-    }
-    catch(err){
+    } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
     }
@@ -138,7 +137,7 @@ module.exports = {
     }
   },
   getRoom: async (roomId) => {
-    try{
+    try {
       let room = await GameRoom.findByPk(roomId);
       return response(baseResponse.SUCCESS, room);
     } catch (err) {
@@ -259,6 +258,19 @@ module.exports = {
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
+    }
+  },
+  checkIsInGameStatus: async (roomId, userId) => {
+    let isStart = await GameStatus.findOne({
+      where: {
+        roomId: roomId,
+        UserId: userId,
+      },
+    });
+    if (isStart) {
+      return true;
+    } else {
+      return false;
     }
   },
 };

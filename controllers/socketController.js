@@ -13,8 +13,57 @@ module.exports = function (io) {
     socket.on('exitRoom', exitRoom);
     socket.on('patchGameStatus', patchGameStatus);
     socket.on('endCycle', endCycle);
+    socket.on('startGame', startGame);
 
     socket.on('useActionSpace', useActionSpace);
+    socket.on('endTurn', endTurn);
+
+    async function endTurn(data) {
+      let userId = data.userId;
+      let roomId = data.roomId;
+
+      let updatedStatus = await gameService.endTurn(roomId, userId);
+      if (updatedStatus.isSuccess === false) {
+        io.to(roomId).emit('endTurn', baseResponse.BAD_REQUEST);
+        return;
+      } else {
+        io.to(roomId).emit('endTurn', updatedStatus);
+        return;
+      }
+    }
+
+    async function startGame(data) {
+      // data 형식
+      // [
+      //   {
+      //     "roomId": 1,
+      //     "userId": "user1"
+      //   },
+      //   {
+      //     "roomId": 1,
+      //     "userId": "user2"
+      //   }
+      // ]
+      data.forEach(async (roomData) => {
+        let roomId = roomData.roomId;
+        let userId = roomData.userId;
+        let isStart = await roomService.checkIsInGameStatus(roomId, userId);
+        if (isStart) {
+          io.to(roomId).emit(
+            'startGame',
+            errResponse(baseResponse.BAD_REQUEST)
+          );
+          return;
+        } else {
+          await gameService.startGame(roomId, userId);
+        }
+      });
+      let gameStatus = await roomService.getGameStatus(data[0].roomId);
+      io.to(data[0].roomId).emit('startGame', gameStatus);
+
+      let updatedRoom = await roomService.getRoom(data[0].roomId);
+      io.sockets.emit('updatedRoom', updatedRoom);
+    }
 
     async function useActionSpace(data) {
       // 주요 및 보조 설비 이벤트
@@ -310,10 +359,12 @@ module.exports = function (io) {
           data.roomId
         );
         io.sockets.emit('useActionSpace', updateResult);
-      } 
+      }
       // 밭 농사하기
       else if (data.actionName === 'Cultivation') {
-        let updateResult = await gameService.updateGoods(data.userId, [data.goods[0]]);
+        let updateResult = await gameService.updateGoods(data.userId, [
+          data.goods[0],
+        ]);
         if (updateResult.isSuccess == false) {
           io.to(data.roomId).emit('useActionSpace', updateResult);
           return;
@@ -326,22 +377,25 @@ module.exports = function (io) {
         io.to(data.roomId).emit('useActionSpace', updateResult);
       }
       // 농장 개조하기
-      else if(data.actionName === 'Farm redevelopment'){
-        let updateResult = await utilities.fixHouse(data.userId, data.roomId, data.goods);
+      else if (data.actionName === 'Farm redevelopment') {
+        let updateResult = await utilities.fixHouse(
+          data.userId,
+          data.roomId,
+          data.goods
+        );
         if (updateResult.isSuccess == false) {
           io.to(roomId).emit('useActionSpace', updateResult);
           return;
         }
         // 그리고/또는 울타리 치기
-        if(data.goods.length > 3){
-          data.goods.splice(0,3);
+        if (data.goods.length > 3) {
+          data.goods.splice(0, 3);
           data.goods[2].name = 'field';
           data.goods[2].isAdd = true;
           updateResult = await gameService.updateGoods(data.userId, data.goods);
           io.to(data.roomId).emit('useActionSpace', updateResult);
         }
-      }
-      else {
+      } else {
         // else
         let updateResult = await gameService.updateGoods(
           data.userId,
@@ -492,38 +546,38 @@ module.exports = function (io) {
 
     async function endCycle(data) {
       try {
-
         let roomId = data.roomId;
         let userId = data.userId;
 
         // 작물 수확
         let result = await gameService.harvestCrop(userId, roomId);
-        if(result.isSuccess === false){
+        if (result.isSuccess === false) {
           io.sockets.emit('endCycle', result);
           return;
         }
         // 음식 지불
-        else{
+        else {
           result = await gameService.payFood(userId, roomId);
-          if(result.isSuccess === false){
+          if (result.isSuccess === false) {
             io.sockets.emit('endCycle', result);
             return;
           }
           // 가축 번식
-          else{
+          else {
             result = await gameService.breedAnimal(userId, roomId);
-            if(result.isSuccess === false){
+            if (result.isSuccess === false) {
               io.sockets.emit('endCycle', result);
               return;
-            }
-            else{
-              let getPlayerStatus = await gameService.getPlayerStatus(userId, roomId);
+            } else {
+              let getPlayerStatus = await gameService.getPlayerStatus(
+                userId,
+                roomId
+              );
               console.log(getPlayerStatus);
               io.sockets.emit('endCycle', getPlayerStatus);
             }
           }
         }
-
       } catch (err) {
         console.log(err);
         io.sockets.emit('endCycle', errResponse(baseResponse.SERVER_ERROR));
