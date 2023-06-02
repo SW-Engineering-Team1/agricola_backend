@@ -1,6 +1,6 @@
 module.exports = (sequelize, DataTypes) => {
   const GameStatus = sequelize.define(
-    'GameStatus',
+    'GameStatuses',
     {
       // roomId: {
       //   type: DataTypes.INTEGER,
@@ -34,6 +34,10 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
       },
       wood: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      fence: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
