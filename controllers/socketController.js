@@ -54,7 +54,7 @@ module.exports = function (io) {
               isAdd: true,
             },
           ];
-        } else if (data.goods[0].name === 'vegetable') {
+        } else if (data.goods[0].name === 'vegeOnStorage') {
           dataList = [
             data.goods[0],
             {
