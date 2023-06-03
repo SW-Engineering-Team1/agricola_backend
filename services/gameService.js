@@ -166,6 +166,15 @@ module.exports = {
         let findCardResult = await this.findCard(goodsName);
         let cardCost = findCardResult.cardCost;
 
+        if ((goodsName = 'Bottle')) {
+          let familyNum =
+            gameStatus.dataValues.family + gameStatus.dataValues.baby;
+          cardCost = [
+            { num: 1 * familyNum, name: 'sand', isAdd: false },
+            { num: 1 * familyNum, name: 'food', isAdd: false },
+          ];
+        }
+
         let updateGoodsResult = await this.updateGoods(userId, cardCost);
         if (updateGoodsResult.isSuccess == false) {
           return false;
