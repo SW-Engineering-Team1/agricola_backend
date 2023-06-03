@@ -112,7 +112,7 @@ module.exports = function (io) {
           );
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
         } else {
-          response(baseResponse.NOT_ENOUGHDATA);
+          io.to(data.roomId).emit('useActionSpace', baseResponse.BAD_REQUEST);
         }
       }
       // 씨뿌리기 이벤트
