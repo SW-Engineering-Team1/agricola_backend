@@ -41,6 +41,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      cageArea: {
+        type: DataTypes.INTEGER,
+        dafaultValue: 0,
+      },
       sand: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
