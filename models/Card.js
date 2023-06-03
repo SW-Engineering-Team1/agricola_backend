@@ -7,6 +7,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         primaryKey: true,
       },
+      cardCost: {
+        type: DataTypes.JSON,
+        allowNull: false,
+      },
       cardScore: {
         type: DataTypes.INTEGER(1),
         allowNull: false,
