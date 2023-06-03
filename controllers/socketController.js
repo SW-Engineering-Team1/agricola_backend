@@ -12,6 +12,8 @@ module.exports = function (io) {
     socket.on('joinRoom', joinRoom);
     socket.on('exitRoom', exitRoom);
     socket.on('patchGameStatus', patchGameStatus);
+    socket.on('startRound', startRound);
+    socket.on('endRound', endRound);
     socket.on('endCycle', endCycle);
     socket.on('startGame', startGame);
 
@@ -123,7 +125,7 @@ module.exports = function (io) {
         // 시작 플레이어 되기 그리고 보조 설비 1개 내려놓기
         if (data.goods.length === 2) {
           // 시작 플레이어 되기
-          let updateOrderResult = await gameService.updateOrder(
+          let updateOrderResult = await gameService.updateNextOrder(
             data.roomId,
             data.userId
           );
@@ -410,7 +412,6 @@ module.exports = function (io) {
       try {
         await roomService.patchGameStatus(data);
         let gameStatus = await roomService.getGameStatus(data.roomId);
-        console.log(gameStatus);
         io.to(data.roomId).emit('patchGameStatus', gameStatus);
       } catch (err) {
         console.log(err);
@@ -573,7 +574,6 @@ module.exports = function (io) {
                 userId,
                 roomId
               );
-              console.log(getPlayerStatus);
               io.sockets.emit('endCycle', getPlayerStatus);
             }
           }
@@ -582,6 +582,53 @@ module.exports = function (io) {
         console.log(err);
         io.sockets.emit('endCycle', errResponse(baseResponse.SERVER_ERROR));
       }
+    }
+
+    async function startRound(data) {
+      let roomId = data.roomId;
+      let findUserList = await roomService.findUserListByRoomId(roomId);
+      if (findUserList.length == 0) {
+        io.to(data.roomId).emit('startRound', baseResponse.BAD_REQUEST);
+        return;
+      }
+      // 게임 순서 변경
+      let updateOrderResult = await gameService.updateOrder(
+        findUserList,
+        roomId
+      );
+      if (updateOrderResult.isSuccess == false) {
+        io.to(data.roomId).emit('startRound', baseResponse.BAD_REQUEST);
+        return;
+      }
+      // 구성물 수거 (소규모 농부, Small farmer)
+      let usedJobCardResult;
+      let updateResult = [];
+      for (let userId of findUserList) {
+        usedJobCardResult = await gameService.usedJobCard(
+          userId,
+          'Small farmer'
+        );
+        if (usedJobCardResult.isSuccess == false) {
+          io.to(data.roomId).emit('startRound', baseResponse.BAD_REQUEST);
+          return;
+        }
+        // 소규모 농부 사용되었다면
+        if (usedJobCardResult) {
+          updateResult = await gameService.getPlayerStatus(userId, roomId);
+        }
+      }
+      io.to(data.roomId).emit('startRound', {
+        updateOrderResult,
+        'Small Farmer': updateResult,
+      });
+      // io.sockets.emit('startRound', {
+      //   updateOrderResult,
+      //   'Small Farmer': updateResult,
+      // });
+    }
+
+    async function endRound(data) {
+      io.to(data.roomId).emit('endRound', 'endRound');
     }
   });
 };

@@ -210,7 +210,7 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
-  updateOrder: async function (roomId, userId) {
+  updateNextOrder: async function (roomId, userId) {
     try {
       await GameStatus.update(
         {
@@ -564,6 +564,70 @@ module.exports = {
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
+    }
+  },
+  updateOrder: async function (userIdList, roomId) {
+    try {
+      for (let userId of userIdList) {
+        await GameStatus.update(
+          {
+            order: sequelize.col('nextOrder'),
+            isMyTurn: sequelize.literal(
+              'CASE WHEN nextOrder = 1 THEN true ELSE false END'
+            ),
+          },
+          {
+            where: {
+              userId,
+            },
+          }
+        );
+      }
+      let orderResult = [];
+      for (let i = 1; i <= 2; i++) {
+        let findResult = await GameStatus.findOne({
+          where: {
+            order: i,
+          },
+          attributes: ['userId'],
+        });
+        orderResult.push(findResult.dataValues.userId);
+      }
+      return orderResult;
+    } catch (err) {
+      console.log(err);
+      return baseResponse.DB_ERROR;
+    }
+  },
+  usedJobCard: async function (userId, cardName) {
+    try {
+      let findResult = await GameStatus.findOne({
+        where: { userId },
+      });
+      let usedJobCard = findResult.dataValues.usedJobCard;
+      if (!usedJobCard.includes(cardName)) {
+        return false;
+      }
+      if (
+        findResult.dataValues.woodHouse == 2 ||
+        findResult.dataValues.sandHouse == 2 ||
+        findResult.dataValues.stoneHouse == 2
+      ) {
+        let updateData = [
+          {
+            name: 'wood',
+            num: 1,
+            isAdd: true,
+          },
+        ];
+        await this.updateGoods(userId, updateData);
+        return true;
+      } else {
+        return false;
+      }
+    } catch (err) {
+      console.log(err);
+      return baseResponse.DB_ERROR;
     }
   },
 };
