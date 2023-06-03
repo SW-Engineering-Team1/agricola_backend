@@ -100,7 +100,6 @@ module.exports = function (io) {
             data.roomId
           );
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
-          io.sockets.emit('useActionSpace', updatedPlayer);
         } else if (isExist === 'sub') {
           // 총 emit 한 개(플레이어의 보조설비 리스트)
           // 보조설비를 사용한 플레이어의 상태 emit 필요
