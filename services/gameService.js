@@ -812,9 +812,6 @@ module.exports = {
 
       // 보조설비 카드 점수
       for (let cardName of data.usedSubFacilityCard) {
-        if (cardName == 'Manger') {
-          continue;
-        }
         let cardScore = await this.findCardScore(cardName);
         score += cardScore;
       }
