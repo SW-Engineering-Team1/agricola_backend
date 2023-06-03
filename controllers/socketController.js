@@ -11,7 +11,6 @@ module.exports = function (io) {
     // socket.on('getRooms', getRooms);
     socket.on('joinRoom', joinRoom);
     socket.on('exitRoom', exitRoom);
-    socket.on('patchGameStatus', patchGameStatus);
     socket.on('startRound', startRound);
     socket.on('endRound', endRound);
     socket.on('endCycle', endCycle);
@@ -65,8 +64,8 @@ module.exports = function (io) {
       let gameStatus = await roomService.getGameStatus(data[0].roomId);
       io.to(data[0].roomId).emit('startGame', gameStatus);
 
-      let updatedRoom = await roomService.getRoom(data[0].roomId);
-      io.sockets.emit('updatedRoom', updatedRoom);
+      let updatedRooms = await roomService.getRoos();
+      io.sockets.emit('updatedRooms', updatedRooms);
     }
 
     async function useActionSpace(data) {
@@ -265,7 +264,7 @@ module.exports = function (io) {
         }
       }
       // 집 개조하기
-      else if (data.actionName === 'Houser Redevelopment') {
+      else if (data.actionName === 'House Redevelopment') {
         let updateResult = await utilities.fixHouse(
           data.userId,
           data.roomId,
@@ -410,16 +409,6 @@ module.exports = function (io) {
       }
     }
 
-    async function patchGameStatus(data) {
-      try {
-        await roomService.patchGameStatus(data);
-        let gameStatus = await roomService.getGameStatus(data.roomId);
-        io.to(data.roomId).emit('patchGameStatus', gameStatus);
-      } catch (err) {
-        console.log(err);
-      }
-    }
-
     async function exitRoom(data) {
       try {
         let userId = data.userId;
@@ -430,7 +419,8 @@ module.exports = function (io) {
         if (isHost) {
           // Delete the room
           await roomService.deleteRoom(roomId);
-          io.sockets.emit('patchRoomList', getRoomsResult);
+          let updatedRooms = await roomService.getRooms();
+          io.sockets.emit('updatedRooms', updatedRooms);
           return;
         }
 
@@ -450,8 +440,9 @@ module.exports = function (io) {
         // Delete the user from the room
         await roomService.exitRoom(roomId, userId);
 
-        let roomDetail = await roomService.getRoom(roomId);
-        io.sockets.emit('updatedRoom', roomDetail);
+        let updatedRooms = await roomService.getRooms();
+        io.sockets.emit('updatedRooms', updatedRooms);
+        // TODO: 방 안에도 보내주는 emit 필요
       } catch (err) {
         console.log(err);
         io.sockets.emit('exitRooms', errResponse(baseResponse.SERVER_ERROR));
@@ -460,8 +451,8 @@ module.exports = function (io) {
 
     async function enterLobby() {
       try {
-        let getRoomsResult = await roomService.getRooms();
-        io.sockets.emit('patchRoomList', getRoomsResult);
+        let updatedRooms = await roomService.getRooms();
+        io.sockets.emit('updatedRooms', updatedRooms);
       } catch (err) {
         console.log(err);
         io.sockets.emit(
@@ -504,8 +495,8 @@ module.exports = function (io) {
               hostId
             );
             socket.join(roomId.dataValues.room_id);
-            let getRoomsResult = await roomService.getRooms();
-            io.sockets.emit('patchRoomList', getRoomsResult);
+            let updatedRooms = await roomService.getRooms();
+            io.sockets.emit('updatedRooms', updatedRooms);
           }
         }
       } catch (err) {
@@ -537,8 +528,9 @@ module.exports = function (io) {
             await roomService.joinRoom(roomId, userId);
             socket.join(parseInt(roomId));
 
-            let roomDetail = await roomService.getRoom(roomId);
-            io.sockets.emit('updatedRoom', roomDetail);
+            let updatedRooms = await roomService.getRooms();
+            io.sockets.emit('updatedRooms', updatedRooms);
+            // TODO: 방 안에도 보내주는 emit 필요
           }
         }
       } catch (err) {
@@ -576,7 +568,7 @@ module.exports = function (io) {
                 userId,
                 roomId
               );
-              io.sockets.emit('endCycle', getPlayerStatus);
+              io.to(roomId).emit('endCycle', getPlayerStatus);
             }
           }
         }
