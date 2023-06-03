@@ -3,6 +3,7 @@ const { response, errResponse } = require('../config/response');
 const models = require('../models');
 const GameStatus = models.game_status;
 const GameRooms = models.gameroom;
+const Card = models.card;
 const sequelize = require('sequelize');
 const roomService = require('../services/roomService');
 const Op = sequelize.Op;
@@ -625,6 +626,167 @@ module.exports = {
       } else {
         return false;
       }
+    } catch (err) {
+      console.log(err);
+      return baseResponse.DB_ERROR;
+    }
+  },
+  calGameScore: async function (roomId) {
+    let gameResult = [];
+    let gameStatus = await GameStatus.findAll({
+      where: {
+        roomId,
+      },
+    });
+    for (let status of gameStatus) {
+      let data = status.dataValues;
+      let score = 0;
+
+      // 밭
+      if (data.field <= 1) {
+        score -= 1;
+      } else if (data.field == 2) {
+        score += 1;
+      } else if (data.field == 3) {
+        score += 2;
+      } else if (data.field == 4) {
+        score += 3;
+      } else if (data.field >= 5) {
+        score += 4;
+      }
+
+      // 우리
+      if (data.cage == 0) {
+        score -= 1;
+      } else if (data.cage == 1) {
+        score += 1;
+      } else if (data.cage == 2) {
+        score += 2;
+      } else if (data.cage == 3) {
+        score += 3;
+      } else if (data.cage >= 4) {
+        score += 4;
+      }
+
+      // 곡식과 채소
+      if (data.grainOnStorage == 0) {
+        score -= 1;
+      } else if (data.grainOnStorage <= 3) {
+        score += 1;
+      } else if (data.grainOnStorage <= 5) {
+        score += 2;
+      } else if (data.grainOnStorage <= 7) {
+        score += 3;
+      } else if (data.grainOnStorage >= 8) {
+        score += 4;
+      }
+
+      if (data.vegeOnStorage == 0) {
+        score -= 1;
+      } else if (data.vegeOnStorage == 1) {
+        score += 1;
+      } else if (data.vegeOnStorage == 2) {
+        score += 2;
+      } else if (data.vegeOnStorage == 3) {
+        score += 3;
+      } else if (data.vegeOnStorage >= 4) {
+        score += 4;
+      }
+
+      // 가축
+      if (data.sheep == 0) {
+        score -= 1;
+      } else if (data.sheep <= 3) {
+        score += 1;
+      } else if (data.sheep <= 5) {
+        score += 2;
+      } else if (data.sheep <= 7) {
+        score += 3;
+      } else if (data.sheep >= 8) {
+        score += 4;
+      }
+
+      if (data.pig == 0) {
+        score -= 1;
+      } else if (data.pig <= 2) {
+        score += 1;
+      } else if (data.pig <= 4) {
+        score += 2;
+      } else if (data.pig <= 6) {
+        score += 3;
+      } else if (data.pig >= 7) {
+        score += 4;
+      }
+
+      if (data.cow == 0) {
+        score -= 1;
+      } else if (data.cow == 1) {
+        score += 1;
+      } else if (data.cow <= 3) {
+        score += 2;
+      } else if (data.cow <= 5) {
+        score += 3;
+      } else if (data.cow >= 6) {
+        score += 4;
+      }
+
+      // 사용하지 않는 빈칸
+      score +=
+        15 -
+        (data.field +
+          data.woodHouse +
+          data.sandHouse +
+          data.stoneHouse +
+          data.cageArea);
+
+      // 울타리 친 외양간 보류
+
+      // 집
+      score += data.sandHouse;
+      score += data.stoneHouse * 2;
+
+      // 가족 구성원
+      score += data.family * 3;
+      score += data.baby * 3;
+
+      // 주요설비 카드 점수
+      for (let cardName of data.usedMainFacilityCard) {
+        let cardScore = await this.findCardScore(cardName);
+        score += cardScore;
+      }
+
+      // 보조설비 카드 점수
+      for (let cardName of data.usedSubFacilityCard) {
+        let cardScore = await this.findCardScore(cardName);
+        score += cardScore;
+      }
+
+      // 직업 카드 점수
+      for (let cardName of data.usedJobCard) {
+        let cardScore = await this.findCardScore(cardName);
+        score += cardScore;
+      }
+
+      // 구걸 토큰
+      score -= data.numOfBeggingToken * 3;
+      gameResult.push({
+        userId: data.UserId,
+        score: score,
+      });
+    }
+
+    gameResult.sort((x, y) => y.score - x.score);
+    return gameResult;
+  },
+  findCardScore: async function (cardName) {
+    try {
+      let findResult = await Card.findOne({
+        where: {
+          card_name: cardName,
+        },
+        attributes: ['card_score'],
+      });
+      return findResult.dataValues.card_score;
     } catch (err) {
       console.log(err);
       return baseResponse.DB_ERROR;
