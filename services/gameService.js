@@ -112,6 +112,18 @@ module.exports = {
             userId,
           },
         });
+
+        // 비용 내기
+        let findCardResult = await this.findCard(goodsName);
+        let cardCost = findCardResult.cardCost;
+
+        let updateGoodsResult = await this.updateGoods(userId, cardCost);
+        console.log(updateGoodsResult);
+        if (updateGoodsResult.isSuccess == false) {
+          return false;
+        }
+
+        // 업데이트
         const updatedRemainedMainFacilityCard =
           gameRoom.dataValues.remainedMainFacilityCard.filter(
             (card) => card != goodsName
@@ -138,6 +150,7 @@ module.exports = {
             },
           }
         );
+        return true;
       } catch (err) {
         console.log(err);
         return errResponse(baseResponse.DB_ERROR);
@@ -800,6 +813,19 @@ module.exports = {
         },
       });
       return findResult.dataValues.usedMainFacilityCard;
+    } catch (err) {
+      console.log(err);
+      return baseResponse.DB_ERROR;
+    }
+  },
+  findCard: async function (cardName) {
+    try {
+      let findResult = await Card.findOne({
+        where: {
+          cardName,
+        },
+      });
+      return findResult.dataValues;
     } catch (err) {
       console.log(err);
       return baseResponse.DB_ERROR;

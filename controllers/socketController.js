@@ -78,13 +78,16 @@ module.exports = function (io) {
         );
         if (isExist === 'main') {
           // 총 emit 두 개(게임 방의 주요설비 판 내용 + 플레이어의 주요설비 리스트)
-          await gameService.updateFacilityCard(
+          let updateFacilityCardResult = await gameService.updateFacilityCard(
             data.goods[0].name,
             data.userId,
             data.roomId,
             isExist
           );
-
+          if (!updateFacilityCardResult) {
+            io.to(data.roomId).emit('useActionSpace', baseResponse.BAD_REQUEST);
+            return;
+          }
           // 주요설비 관련 내용 emit
           let updatedFacilityList = await gameService.getMainFacilityCards(
             data.roomId
@@ -97,6 +100,7 @@ module.exports = function (io) {
             data.roomId
           );
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
+          io.sockets.emit('useActionSpace', updatedPlayer);
         } else if (isExist === 'sub') {
           // 총 emit 한 개(플레이어의 보조설비 리스트)
           // 보조설비를 사용한 플레이어의 상태 emit 필요
