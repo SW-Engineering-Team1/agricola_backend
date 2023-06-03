@@ -713,7 +713,7 @@ module.exports = function (io) {
       let roomId = data.roomId;
       let calGameScoreResult = await gameService.calGameScore(roomId);
 
-      io.sockets.emit('endGame', calGameScoreResult);
+      io.to(data.roomId).emit('endGame', calGameScoreResult);
     }
   });
 };
