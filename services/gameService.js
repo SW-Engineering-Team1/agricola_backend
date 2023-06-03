@@ -824,11 +824,11 @@ module.exports = {
     try {
       let findResult = await Card.findOne({
         where: {
-          card_name: cardName,
+          cardName,
         },
-        attributes: ['card_score'],
+        attributes: ['cardScore'],
       });
-      return findResult.dataValues.card_score;
+      return findResult.dataValues.cardScore;
     } catch (err) {
       console.log(err);
       return baseResponse.DB_ERROR;
