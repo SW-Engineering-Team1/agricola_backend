@@ -78,13 +78,16 @@ module.exports = function (io) {
         );
         if (isExist === 'main') {
           // 총 emit 두 개(게임 방의 주요설비 판 내용 + 플레이어의 주요설비 리스트)
-          await gameService.updateFacilityCard(
+          let updateFacilityCardResult = await gameService.updateFacilityCard(
             data.goods[0].name,
             data.userId,
             data.roomId,
             isExist
           );
-
+          if (!updateFacilityCardResult) {
+            io.to(data.roomId).emit('useActionSpace', baseResponse.BAD_REQUEST);
+            return;
+          }
           // 주요설비 관련 내용 emit
           let updatedFacilityList = await gameService.getMainFacilityCards(
             data.roomId
@@ -108,7 +111,7 @@ module.exports = function (io) {
           );
           io.to(data.roomId).emit('useActionSpace', updatedPlayer);
         } else {
-          response(baseResponse.NOT_ENOUGHDATA);
+          io.to(data.roomId).emit('useActionSpace', baseResponse.BAD_REQUEST);
         }
       }
       // 씨뿌리기 이벤트
