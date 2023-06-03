@@ -15,11 +15,59 @@ module.exports = function (io) {
     socket.on('endRound', endRound);
     socket.on('endCycle', endCycle);
     socket.on('startGame', startGame);
+    socket.on('useFacility', useFacility);
 
     socket.on('useActionSpace', useActionSpace);
     socket.on('endTurn', endTurn);
 
     socket.on('endGame', endGame);
+
+    async function useFacility(data) {
+      let userId = data.userId;
+      let roomId = data.roomId;
+      let dataList = [];
+      if (data.actionName === 'stove') {
+        if (data.goods[0].name === 'sheep') {
+          dataList = [
+            data.goods[0],
+            {
+              name: 'food',
+              num: parseInt(data.goods[0].num) * 2,
+              isAdd: true,
+            },
+          ];
+        } else if (data.goods[0].name === 'pig') {
+          dataList = [
+            data.goods[0],
+            {
+              name: 'food',
+              num: parseInt(data.goods[0].num) * 2,
+              isAdd: true,
+            },
+          ];
+        } else if (data.goods[0].name === 'cow') {
+          dataList = [
+            data.goods[0],
+            {
+              name: 'food',
+              num: parseInt(data.goods[0].num) * 3,
+              isAdd: true,
+            },
+          ];
+        } else if (data.goods[0].name === 'vegetable') {
+          dataList = [
+            data.goods[0],
+            {
+              name: 'food',
+              num: parseInt(data.goods[0].num) * 2,
+              isAdd: true,
+            },
+          ];
+        }
+        let updatedPlayer = await gameService.updateGoods(userId, dataList);
+        io.to(roomId).emit('useFacility', updatedPlayer);
+      }
+    }
 
     async function endTurn(data) {
       let userId = data.userId;
@@ -560,6 +608,8 @@ module.exports = function (io) {
             let updatedRooms = await roomService.getRooms();
             io.sockets.emit('updatedRooms', updatedRooms);
             // TODO: 방 안에도 보내주는 emit 필요
+            let playerInRoom = await roomService.findUserListByRoomId(roomId);
+            io.to(roomId).emit('joinRoom', playerInRoom);
           }
         }
       } catch (err) {

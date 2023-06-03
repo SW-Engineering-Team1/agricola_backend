@@ -342,6 +342,11 @@ module.exports = {
             cardName: jobCardName,
           },
         });
+        cardCost.dataValues.cardCost.push({
+          name: 'food',
+          num: 1,
+          isAdd: true,
+        });
         await this.updateGoods(userId, cardCost.dataValues.cardCost);
         if (jobCardName === 'Counselor') {
           let tmp = [];
