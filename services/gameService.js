@@ -161,6 +161,17 @@ module.exports = {
             userId,
           },
         });
+
+        // 비용 내기
+        let findCardResult = await this.findCard(goodsName);
+        let cardCost = findCardResult.cardCost;
+
+        let updateGoodsResult = await this.updateGoods(userId, cardCost);
+        if (updateGoodsResult.isSuccess == false) {
+          return false;
+        }
+
+        // 업데이트
         const updatedRemainedSubFacilityCard =
           gameStatus.dataValues.remainedSubFacilityCard.filter(
             (card) => card != goodsName
@@ -189,6 +200,8 @@ module.exports = {
             },
           }
         );
+
+        // 카드 효과 (보조설비 다진 흙)
         if (goodsName === 'Crushed soil') {
           await GameStatus.update(
             {

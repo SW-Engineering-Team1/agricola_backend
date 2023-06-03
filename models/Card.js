@@ -7,6 +7,10 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         primaryKey: true,
       },
+      cardKind: {
+        type: DataTypes.STRING(45),
+        allowNull: false,
+      },
       cardCost: {
         type: DataTypes.JSON,
         allowNull: false,
