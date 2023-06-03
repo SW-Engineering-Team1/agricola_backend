@@ -39,7 +39,7 @@ module.exports = (sequelize, DataTypes) => {
       },
       fence: {
         type: DataTypes.INTEGER,
-        defaultValue: 0,
+        defaultValue: 15,
       },
       cageArea: {
         type: DataTypes.INTEGER,
