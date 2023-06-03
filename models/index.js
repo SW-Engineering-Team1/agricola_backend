@@ -28,6 +28,7 @@ db.users = require('./User.js')(sequelize, DataTypes);
 db.gameroom = require('./GameRoom.js')(sequelize, DataTypes);
 db.user_gameroom = require('./UserGameRoom.js')(sequelize, DataTypes);
 db.game_status = require('./GameStatus.js')(sequelize, DataTypes);
+db.card = require('./Card.js')(sequelize, DataTypes);
 
 // Making one-to-many relationship between users and gamerooms
 db.users.hasMany(db.gameroom, {
