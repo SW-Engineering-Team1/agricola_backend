@@ -520,6 +520,8 @@ module.exports = function (io) {
         let updatedRooms = await roomService.getRooms();
         io.sockets.emit('updatedRooms', updatedRooms);
         // TODO: 방 안에도 보내주는 emit 필요
+        let playerInRoom = await roomService.findUserListByRoomId(roomId);
+        io.to(roomId).emit('exitRoom', playerInRoom);
       } catch (err) {
         console.log(err);
         io.sockets.emit('exitRooms', errResponse(baseResponse.SERVER_ERROR));
