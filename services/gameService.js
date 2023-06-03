@@ -792,4 +792,17 @@ module.exports = {
       return baseResponse.DB_ERROR;
     }
   },
+  findUsedMainFacility: async function (userId) {
+    try {
+      let findResult = await GameStatus.findOne({
+        where: {
+          userId,
+        },
+      });
+      return findResult.dataValues.usedMainFacilityCard;
+    } catch (err) {
+      console.log(err);
+      return baseResponse.DB_ERROR;
+    }
+  },
 };
