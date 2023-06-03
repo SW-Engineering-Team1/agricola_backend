@@ -1,3 +1,4 @@
+const baseResponse = require('../config/baseResponseStatus');
 const gameService = require('../services/gameService');
 
 module.exports = {
@@ -18,17 +19,37 @@ module.exports = {
   },
 
   bakeBread: async function (userId, goodsList) {
+    let findUsedMainFacilityResult = await gameService.findUsedMainFacility(
+      userId
+    );
     goodsList[0].name = goodsList[0].name + 'OnStorage';
+
+    if (findUsedMainFacilityResult.includes('stove')) {
+      goodsList = [
+        goodsList[0],
+        {
+          name: 'food',
+          num: parseInt(goodsList[0].num) * 2,
+          isAdd: true,
+        },
+      ];
+    } else if (findUsedMainFacilityResult.includes('earthen kiln')) {
+      goodsList = [
+        goodsList[0],
+        {
+          name: 'food',
+          num: parseInt(goodsList[0].num) * 5,
+          isAdd: true,
+        },
+      ];
+    } else {
+      return baseResponse.BAD_REQUEST;
+    }
     let updateResult = await gameService.updateGoods(userId, goodsList);
     if (updateResult.isSuccess == false) {
       return updateResult;
     }
-
-    goodsList[0].name = 'food';
-    goodsList[0].num = parseInt(goodsList[0].num) * 5;
-    goodsList[0].isAdd = true;
-
-    return await gameService.updateGoods(userId, goodsList);
+    return updateResult;
   },
 
   addSubFacility: async function (goodsList, userId, roomId, facilType) {
