@@ -799,6 +799,9 @@ module.exports = {
 
       // 보조설비 카드 점수
       for (let cardName of data.usedSubFacilityCard) {
+        if (cardName == 'Manger') {
+          continue;
+        }
         let cardScore = await this.findCardScore(cardName);
         score += cardScore;
       }
@@ -807,6 +810,21 @@ module.exports = {
       for (let cardName of data.usedJobCard) {
         let cardScore = await this.findCardScore(cardName);
         score += cardScore;
+      }
+
+      // 카드 효과
+      for (let cardName of data.usedSubFacilityCard) {
+        if (cardName == 'Manger') {
+          if (data.cageArea >= 10) {
+            score += 4;
+          } else if (data.cageArea >= 8) {
+            score += 3;
+          } else if (data.cageArea == 7) {
+            score += 2;
+          } else if (data.cageArea == 6) {
+            score += 1;
+          }
+        }
       }
 
       // 구걸 토큰
