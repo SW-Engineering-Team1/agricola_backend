@@ -731,7 +731,7 @@ module.exports = {
       }
 
       // 사용하지 않는 빈칸
-      score +=
+      score -=
         15 -
         (data.field +
           data.woodHouse +
