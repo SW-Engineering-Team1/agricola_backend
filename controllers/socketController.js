@@ -412,7 +412,6 @@ module.exports = function (io) {
       try {
         await roomService.patchGameStatus(data);
         let gameStatus = await roomService.getGameStatus(data.roomId);
-        console.log(gameStatus);
         io.to(data.roomId).emit('patchGameStatus', gameStatus);
       } catch (err) {
         console.log(err);
@@ -575,7 +574,6 @@ module.exports = function (io) {
                 userId,
                 roomId
               );
-              console.log(getPlayerStatus);
               io.sockets.emit('endCycle', getPlayerStatus);
             }
           }
@@ -593,7 +591,6 @@ module.exports = function (io) {
         io.to(data.roomId).emit('startRound', baseResponse.BAD_REQUEST);
         return;
       }
-      console.log(findUserList);
       // 게임 순서 변경
       let updateOrderResult = await gameService.updateOrder(
         findUserList,
@@ -619,7 +616,6 @@ module.exports = function (io) {
         if (usedJobCardResult) {
           updateResult = await gameService.getPlayerStatus(userId, roomId);
         }
-        console.log(updateResult);
       }
       io.to(data.roomId).emit('startRound', {
         updateOrderResult,
