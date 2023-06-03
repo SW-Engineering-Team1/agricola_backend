@@ -24,7 +24,7 @@ module.exports = {
     );
     goodsList[0].name = goodsList[0].name + 'OnStorage';
 
-    if (findUsedMainFacilityResult.includes('stove')) {
+    if (findUsedMainFacilityResult.includes('Stove')) {
       goodsList = [
         goodsList[0],
         {
@@ -33,7 +33,7 @@ module.exports = {
           isAdd: true,
         },
       ];
-    } else if (findUsedMainFacilityResult.includes('earthen kiln')) {
+    } else if (findUsedMainFacilityResult.includes('Earthen kiln')) {
       goodsList = [
         goodsList[0],
         {

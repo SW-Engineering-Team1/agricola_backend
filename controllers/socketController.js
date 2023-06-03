@@ -26,7 +26,7 @@ module.exports = function (io) {
       let userId = data.userId;
       let roomId = data.roomId;
       let dataList = [];
-      if (data.actionName === 'stove') {
+      if (data.actionName === 'Stove') {
         if (data.goods[0].name === 'sheep') {
           dataList = [
             data.goods[0],
