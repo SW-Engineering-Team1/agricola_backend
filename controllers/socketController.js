@@ -20,6 +20,8 @@ module.exports = function (io) {
     socket.on('useActionSpace', useActionSpace);
     socket.on('endTurn', endTurn);
 
+    socket.on('endGame', endGame);
+
     async function endTurn(data) {
       let userId = data.userId;
       let roomId = data.roomId;
@@ -629,6 +631,13 @@ module.exports = function (io) {
 
     async function endRound(data) {
       io.to(data.roomId).emit('endRound', 'endRound');
+    }
+
+    async function endGame(data) {
+      let roomId = data.roomId;
+      let calGameScoreResult = await gameService.calGameScore(roomId);
+
+      io.sockets.emit('endGame', calGameScoreResult);
     }
   });
 };
