@@ -168,14 +168,14 @@ module.exports = function (io) {
           );
           io.to(data.roomId).emit('useActionSpace', updateResult);
         } else {
-          let updateOrderResult = null;
+          let updateNextOrderResult = null;
           // 시작 플레이어 되기
           if (data.goods[0].name === 'order') {
-            updateOrderResult = await gameService.updateOrder(
+            updateNextOrderResult = await gameService.updateNextOrder(
               data.roomId,
               data.userId
             );
-            if (updateOrderResult.isSuccess === false) {
+            if (updateNextOrderResult.isSuccess === false) {
               io.to(data.roomId).emit(
                 'useActionSpace',
                 baseResponse.BAD_REQUEST
