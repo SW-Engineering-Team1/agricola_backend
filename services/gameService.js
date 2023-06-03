@@ -118,7 +118,6 @@ module.exports = {
         let cardCost = findCardResult.cardCost;
 
         let updateGoodsResult = await this.updateGoods(userId, cardCost);
-        console.log(updateGoodsResult);
         if (updateGoodsResult.isSuccess == false) {
           return false;
         }
