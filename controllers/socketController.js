@@ -66,6 +66,37 @@ module.exports = function (io) {
         }
         let updatedPlayer = await gameService.updateGoods(userId, dataList);
         io.to(roomId).emit('useFacility', updatedPlayer);
+      } else if (data.actionName == 'Hard ceramics') {
+        if (data.goods[0].num == 2) {
+          dataList = [
+            data.goods[0],
+            {
+              name: 'stone',
+              num: 1,
+              isAdd: true,
+            },
+          ];
+        } else if (data.goods[0].num == 3) {
+          dataList = [
+            data.goods[0],
+            {
+              name: 'stone',
+              num: 2,
+              isAdd: true,
+            },
+          ];
+        } else if (data.goods[0].num == 4) {
+          dataList = [
+            data.goods[0],
+            {
+              name: 'stone',
+              num: 3,
+              isAdd: true,
+            },
+          ];
+        }
+        let updatedPlayer = await gameService.updateGoods(userId, dataList);
+        io.to(roomId).emit('useFacility', updatedPlayer);
       }
     }
 
