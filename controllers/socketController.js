@@ -39,14 +39,14 @@ module.exports = function (io) {
       // data 형식
       // [
       //   {
-      //     "roomId": 1,
-      //     "userId": "user1"
+      //     roomId: 1,
+      //     userId: 'test1',
       //   },
       //   {
-      //     "roomId": 1,
-      //     "userId": "user2"
-      //   }
-      // ]
+      //     roomId: 1,
+      //     userId: 'test2',
+      //   },
+      // ];
       data.forEach(async (roomData) => {
         let roomId = roomData.roomId;
         let userId = roomData.userId;
@@ -64,7 +64,7 @@ module.exports = function (io) {
       let gameStatus = await roomService.getGameStatus(data[0].roomId);
       io.to(data[0].roomId).emit('startGame', gameStatus);
 
-      let updatedRooms = await roomService.getRoos();
+      let updatedRooms = await roomService.getRooms();
       io.sockets.emit('updatedRooms', updatedRooms);
     }
 
@@ -397,6 +397,35 @@ module.exports = function (io) {
           data.goods[2].isAdd = true;
           updateResult = await gameService.updateGoods(data.userId, data.goods);
           io.to(data.roomId).emit('useActionSpace', updateResult);
+        }
+      } else if (data.actionName === 'Fencing') {
+        let isHasCrashedSoil = await gameService.isHasCrashedSoil(
+          data.userId,
+          data.roomId
+        );
+        if (isHasCrashedSoil) {
+          if (data.goods[0].name === 'wood' || data.goods[0].name === 'stone') {
+            let updateResult = await gameService.updateGoods(
+              data.userId,
+              data.goods
+            );
+            io.to(data.roomId).emit('useActionSpace', updateResult);
+          } else {
+            io.to(data.roomId).emit('useActionSpace', baseResponse.BAD_REQUEST);
+            return;
+          }
+          return;
+        } else {
+          if (data.goods[0].name === 'wood') {
+            let updateResult = await gameService.updateGoods(
+              data.userId,
+              data.goods
+            );
+            io.to(data.roomId).emit('useActionSpace', updateResult);
+          } else {
+            io.to(data.roomId).emit('useActionSpace', baseResponse.BAD_REQUEST);
+            return;
+          }
         }
       } else {
         // else

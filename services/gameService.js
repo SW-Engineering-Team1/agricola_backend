@@ -177,6 +177,18 @@ module.exports = {
             },
           }
         );
+        if (goodsName === 'Crushed soil') {
+          await GameStatus.update(
+            {
+              sand: sequelize.literal(`sand + 1`),
+            },
+            {
+              where: {
+                userId,
+              },
+            }
+          );
+        }
         return true;
       } catch (err) {
         console.log(err);
@@ -790,6 +802,19 @@ module.exports = {
     } catch (err) {
       console.log(err);
       return baseResponse.DB_ERROR;
+    }
+  },
+  isHasCrashedSoil: async function (userId, roomId) {
+    let userDetail = await GameStatus.findOne({
+      where: {
+        userId,
+        roomId,
+      },
+    });
+    if (userDetail.dataValues.usedSubFacilityCard.includes('Crushed soil')) {
+      return true;
+    } else {
+      return false;
     }
   },
 };
