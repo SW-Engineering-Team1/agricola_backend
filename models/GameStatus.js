@@ -117,6 +117,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      usingField: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
       food: {
         type: DataTypes.INTEGER,
         defaultValue: 0,

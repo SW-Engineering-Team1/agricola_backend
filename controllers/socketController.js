@@ -235,7 +235,11 @@ module.exports = function (io) {
       }
       // 씨뿌리기 이벤트
       else if (data.actionName === 'Grain Utilization') {
-        let updateResult = await utilities.sowSeed(data.userId, data.goods);
+        let updateResult = await utilities.sowSeed(
+          data.userId,
+          data.roomId,
+          data.goods
+        );
         io.to(data.roomId).emit('useActionSpace', updateResult);
       }
       // 빵 굽기 이벤트
