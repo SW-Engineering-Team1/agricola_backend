@@ -161,6 +161,26 @@ module.exports = {
             userId,
           },
         });
+
+        // 비용 내기
+        let findCardResult = await this.findCard(goodsName);
+        let cardCost = findCardResult.cardCost;
+
+        if ((goodsName = 'Bottle')) {
+          let familyNum =
+            gameStatus.dataValues.family + gameStatus.dataValues.baby;
+          cardCost = [
+            { num: 1 * familyNum, name: 'sand', isAdd: false },
+            { num: 1 * familyNum, name: 'food', isAdd: false },
+          ];
+        }
+
+        let updateGoodsResult = await this.updateGoods(userId, cardCost);
+        if (updateGoodsResult.isSuccess == false) {
+          return false;
+        }
+
+        // 업데이트
         const updatedRemainedSubFacilityCard =
           gameStatus.dataValues.remainedSubFacilityCard.filter(
             (card) => card != goodsName
@@ -189,6 +209,8 @@ module.exports = {
             },
           }
         );
+
+        // 카드 효과 (보조설비 다진 흙)
         if (goodsName === 'Crushed soil') {
           await GameStatus.update(
             {
@@ -809,6 +831,21 @@ module.exports = {
         score += cardScore;
       }
 
+      // 카드 효과
+      for (let cardName of data.usedSubFacilityCard) {
+        if (cardName == 'Manger') {
+          if (data.cageArea >= 10) {
+            score += 4;
+          } else if (data.cageArea >= 8) {
+            score += 3;
+          } else if (data.cageArea == 7) {
+            score += 2;
+          } else if (data.cageArea == 6) {
+            score += 1;
+          }
+        }
+      }
+
       // 구걸 토큰
       score -= data.numOfBeggingToken * 3;
       gameResult.push({
@@ -824,11 +861,11 @@ module.exports = {
     try {
       let findResult = await Card.findOne({
         where: {
-          card_name: cardName,
+          cardName,
         },
-        attributes: ['card_score'],
+        attributes: ['cardScore'],
       });
-      return findResult.dataValues.card_score;
+      return findResult.dataValues.cardScore;
     } catch (err) {
       console.log(err);
       return baseResponse.DB_ERROR;
