@@ -8,7 +8,6 @@ module.exports = function (io) {
   io.on('connection', function (socket) {
     socket.on('enterLobby', enterLobby);
     socket.on('createRoom', createRoom);
-    // socket.on('getRooms', getRooms);
     socket.on('joinRoom', joinRoom);
     socket.on('exitRoom', exitRoom);
     socket.on('startRound', startRound);
@@ -95,6 +94,47 @@ module.exports = function (io) {
             },
           ];
         }
+        let updatedPlayer = await gameService.updateGoods(userId, dataList);
+        io.to(roomId).emit('useFacility', updatedPlayer);
+      } else if (data.actionName == 'Brazier') {
+        if (data.goods[0].name === 'sheep') {
+          dataList = [
+            data.goods[0],
+            {
+              name: 'food',
+              num: parseInt(data.goods[0].num) * 2,
+              isAdd: true,
+            },
+          ];
+        } else if (data.goods[0].name === 'pig') {
+          dataList = [
+            data.goods[0],
+            {
+              name: 'food',
+              num: parseInt(data.goods[0].num) * 3,
+              isAdd: true,
+            },
+          ];
+        } else if (data.goods[0].name === 'cow') {
+          dataList = [
+            data.goods[0],
+            {
+              name: 'food',
+              num: parseInt(data.goods[0].num) * 4,
+              isAdd: true,
+            },
+          ];
+        } else if (data.goods[0].name === 'vegeOnStorage') {
+          dataList = [
+            data.goods[0],
+            {
+              name: 'food',
+              num: parseInt(data.goods[0].num) * 3,
+              isAdd: true,
+            },
+          ];
+        }
+        console.log(dataList);
         let updatedPlayer = await gameService.updateGoods(userId, dataList);
         io.to(roomId).emit('useFacility', updatedPlayer);
       }
@@ -350,10 +390,11 @@ module.exports = function (io) {
         let updateResult = await utilities.fixHouse(
           data.userId,
           data.roomId,
-          data.goods
+          data.goods,
+          data.isUsingManager // 재산 관리자 사용 여부 판별을 위한 flag
         );
         if (updateResult.isSuccess == false) {
-          io.to(roomId).emit('useActionSpace', updateResult);
+          io.to(data.roomId).emit('useActionSpace', updateResult);
           return;
         }
 
