@@ -95,12 +95,12 @@ module.exports = (sequelize, DataTypes) => {
       cardCost: [
         {
           name: 'food',
-          num: 2,
+          num: 1,
           isAdd: false,
         },
         {
           name: 'sand',
-          num: 2,
+          num: 1,
           isAdd: false,
         },
       ],
