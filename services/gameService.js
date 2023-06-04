@@ -571,6 +571,16 @@ module.exports = {
       await GameRooms.update(
         {
           status: 'STARTED',
+          remainedMainFacilityCard: [
+            'Stove',
+            'Brazier',
+            'Earthen kiln',
+            'Stone kiln',
+            'Furniture factory',
+            'Bowl factory',
+            'Basket factory',
+            'Well',
+          ],
         },
         {
           where: {
