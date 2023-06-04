@@ -390,10 +390,11 @@ module.exports = function (io) {
         let updateResult = await utilities.fixHouse(
           data.userId,
           data.roomId,
-          data.goods
+          data.goods,
+          data.isUsingManager // 재산 관리자 사용 여부 판별을 위한 flag
         );
         if (updateResult.isSuccess == false) {
-          io.to(roomId).emit('useActionSpace', updateResult);
+          io.to(data.roomId).emit('useActionSpace', updateResult);
           return;
         }
 
