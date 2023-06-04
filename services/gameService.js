@@ -518,7 +518,7 @@ module.exports = {
           usedJobCard: [],
           usedMainFacilityCard: [],
           remainedSubFacilityCard: [
-            'Hard ceramic',
+            'Hard ceramic',
             'Carpenter room',
             'Corn shovel',
             'Threshing plate',
