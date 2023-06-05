@@ -53,7 +53,8 @@ module.exports = function (io) {
               isAdd: true,
             },
           ];
-        } else if (data.goods[0].name === 'vegeOnStorage') {
+        } else if (data.goods[0].name === 'vege') {
+          data.goods[0].name = 'vegeOnStorage';
           dataList = [
             data.goods[0],
             {
@@ -128,7 +129,8 @@ module.exports = function (io) {
               isAdd: true,
             },
           ];
-        } else if (data.goods[0].name === 'vegeOnStorage') {
+        } else if (data.goods[0].name === 'vege') {
+          data.goods[0].name = 'vegeOnStorage';
           dataList = [
             data.goods[0],
             {
