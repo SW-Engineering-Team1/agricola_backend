@@ -8,7 +8,7 @@ const sequelize = new Sequelize('sys', 'root', '1234', {
   dialect: 'mysql',
 });
 
-// 테스트에서 사용될 데이터베이스 연결 - 게임방
+// 테스트에서 사용될 데이터베이스 연결 - 게임방방방방
 const GameRoom = sequelize.define(
   'GameRoom',
   {
