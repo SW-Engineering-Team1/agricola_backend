@@ -726,6 +726,13 @@ module.exports = function (io) {
         io.sockets.emit('startRound', baseResponse.BAD_REQUEST);
         return;
       }
+      // 아기 성장
+      let growBabyResult = await gameService.growBaby(findUserList, roomId);
+      if (growBabyResult.isSuccess == false) {
+        io.sockets.emit('startRound', growBabyResult);
+        return;
+      }
+
       // 게임 순서 변경
       let updateOrderResult = await gameService.updateOrder(
         findUserList,
