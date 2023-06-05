@@ -64,7 +64,7 @@ module.exports = function (io) {
           ];
         }
         let updatedPlayer = await gameService.updateGoods(userId, dataList);
-        io.sockets.emit('useFacility', updatedPlayer);
+        io.to(roomId).emit('useFacility', updatedPlayer);
         test('sibal', (updatedPlayer) => {
           console.log(updatedPlayer);
           assert.equal(updatedPlayer.isSuccess, true);
@@ -99,7 +99,7 @@ module.exports = function (io) {
           ];
         }
         let updatedPlayer = await gameService.updateGoods(userId, dataList);
-        io.sockets.emit('useFacility', updatedPlayer);
+        io.to(roomId).emit('useFacility', updatedPlayer);
       } else if (data.actionName == 'Brazier') {
         if (data.goods[0].name === 'sheep') {
           dataList = [
@@ -140,7 +140,7 @@ module.exports = function (io) {
         }
         console.log(dataList);
         let updatedPlayer = await gameService.updateGoods(userId, dataList);
-        io.sockets.emit('useFacility', updatedPlayer);
+        io.to(roomId).emit('useFacility', updatedPlayer);
       }
     }
 
@@ -150,10 +150,10 @@ module.exports = function (io) {
 
       let updatedStatus = await gameService.endTurn(roomId, userId);
       if (updatedStatus.isSuccess === false) {
-        io.sockets.emit('endTurn', baseResponse.BAD_REQUEST);
+        io.to(roomId).emit('endTurn', baseResponse.BAD_REQUEST);
         return;
       } else {
-        io.sockets.emit('endTurn', updatedStatus);
+        io.to(roomId).emit('endTurn', updatedStatus);
         return;
       }
     }
@@ -175,14 +175,17 @@ module.exports = function (io) {
         let userId = roomData.userId;
         let isStart = await roomService.checkIsInGameStatus(roomId, userId);
         if (isStart) {
-          io.sockets.emit('startGame', errResponse(baseResponse.BAD_REQUEST));
+          io.to(roomId).emit(
+            'startGame',
+            errResponse(baseResponse.BAD_REQUEST)
+          );
           return;
         } else {
           await gameService.startGame(roomId, userId);
         }
       });
       let gameStatus = await roomService.getGameStatus(data[0].roomId);
-      io.sockets.emit('startGame', gameStatus);
+      io.to(data[0].roomId).emit('startGame', gameStatus);
 
       let updatedRooms = await roomService.getRooms();
       io.sockets.emit('updatedRooms', updatedRooms);
@@ -205,21 +208,21 @@ module.exports = function (io) {
             isExist
           );
           if (!updateFacilityCardResult) {
-            io.sockets.emit('useActionSpace', baseResponse.BAD_REQUEST);
+            io.to(data.roomId).emit('useActionSpace', baseResponse.BAD_REQUEST);
             return;
           }
           // 주요설비 관련 내용 emit
           let updatedFacilityList = await gameService.getMainFacilityCards(
             data.roomId
           );
-          io.sockets.emit('useActionSpace', updatedFacilityList);
+          io.to(data.roomId).emit('useActionSpace', updatedFacilityList);
 
           // 주요설비를 사용한 플레이어의 상태 emit 필요
           let updatedPlayer = await gameService.getPlayerStatus(
             data.userId,
             data.roomId
           );
-          io.sockets.emit('useActionSpace', updatedPlayer);
+          io.to(data.roomId).emit('useActionSpace', updatedPlayer);
         } else if (isExist === 'sub') {
           // 총 emit 한 개(플레이어의 보조설비 리스트)
           // 보조설비를 사용한 플레이어의 상태 emit 필요
@@ -229,20 +232,20 @@ module.exports = function (io) {
             data.roomId,
             isExist
           );
-          io.sockets.emit('useActionSpace', updatedPlayer);
+          io.to(data.roomId).emit('useActionSpace', updatedPlayer);
         } else {
-          io.sockets.emit('useActionSpace', baseResponse.BAD_REQUEST);
+          io.to(data.roomId).emit('useActionSpace', baseResponse.BAD_REQUEST);
         }
       }
       // 씨뿌리기 이벤트
       else if (data.actionName === 'Grain Utilization') {
         let updateResult = await utilities.sowSeed(data.userId, data.goods);
-        io.sockets.emit('useActionSpace', updateResult);
+        io.to(data.roomId).emit('useActionSpace', updateResult);
       }
       // 빵 굽기 이벤트
       else if (data.actionName === 'Bake Bread') {
         let updateResult = await utilities.bakeBread(data.userId, data.goods);
-        io.sockets.emit('useActionSpace', updateResult);
+        io.to(data.roomId).emit('useActionSpace', updateResult);
       }
       //회합 장소 이벤트
       else if (data.actionName === 'Meeting Place') {
@@ -254,7 +257,7 @@ module.exports = function (io) {
             data.userId
           );
           if (updateOrderResult.isSuccess === false) {
-            io.sockets.emit('useActionSpace', updateOrderResult);
+            io.to(data.roomId).emit('useActionSpace', updateOrderResult);
             return;
           }
           // 보조 설비 1개 내려놓기
@@ -271,18 +274,24 @@ module.exports = function (io) {
               'sub'
             );
             if (cardResult.isSuccess === false) {
-              io.sockets.emit('useActionSpace', baseResponse.INVALID_CARD_NAME);
+              io.to(data.roomId).emit(
+                'useActionSpace',
+                baseResponse.INVALID_CARD_NAME
+              );
               return;
             }
           } else {
-            io.sockets.emit('useActionSpace', baseResponse.INVALID_CARD_NAME);
+            io.to(data.roomId).emit(
+              'useActionSpace',
+              baseResponse.INVALID_CARD_NAME
+            );
           }
           // 업데이트 된 플레이어 상태 emit
           let updateResult = await gameService.getPlayerStatus(
             data.userId,
             data.roomId
           );
-          io.sockets.emit('useActionSpace', updateResult);
+          io.to(data.roomId).emit('useActionSpace', updateResult);
         } else {
           let updateNextOrderResult = null;
           // 시작 플레이어 되기
@@ -292,7 +301,10 @@ module.exports = function (io) {
               data.userId
             );
             if (updateNextOrderResult.isSuccess === false) {
-              io.sockets.emit('useActionSpace', baseResponse.BAD_REQUEST);
+              io.to(data.roomId).emit(
+                'useActionSpace',
+                baseResponse.BAD_REQUEST
+              );
               return;
             }
           }
@@ -311,14 +323,17 @@ module.exports = function (io) {
                 'sub'
               );
               if (cardResult.isSuccess === false) {
-                io.sockets.emit(
+                io.to(data.roomId).emit(
                   'useActionSpace',
                   baseResponse.INVALID_CARD_NAME
                 );
                 return;
               }
             } else {
-              io.sockets.emit('useActionSpace', baseResponse.INVALID_CARD_NAME);
+              io.to(data.roomId).emit(
+                'useActionSpace',
+                baseResponse.INVALID_CARD_NAME
+              );
               return;
             }
           }
@@ -326,7 +341,7 @@ module.exports = function (io) {
             data.userId,
             data.roomId
           );
-          io.sockets.emit('useActionSpace', updateResult);
+          io.to(data.roomId).emit('useActionSpace', updateResult);
           // io.sockets.emit('useActionSpace', updateResult);
         }
       }
@@ -363,12 +378,15 @@ module.exports = function (io) {
               data.roomId,
               'sub'
             );
-            io.sockets.emit('useActionSpace', updatedPlayer);
+            io.to(data.roomId).emit('useActionSpace', updatedPlayer);
           } else {
-            io.sockets.emit('useActionSpace', updateResult);
+            io.to(data.roomId).emit('useActionSpace', updateResult);
           }
         } else {
-          io.sockets.emit('useActionSpace', baseResponse.NOT_ENOUGHDATA);
+          io.to(data.roomId).emit(
+            'useActionSpace',
+            baseResponse.NOT_ENOUGHDATA
+          );
         }
       }
       // 집 개조하기
@@ -380,7 +398,7 @@ module.exports = function (io) {
           data.isUsingManager // 재산 관리자 사용 여부 판별을 위한 flag
         );
         if (updateResult.isSuccess == false) {
-          io.sockets.emit('useActionSpace', updateResult);
+          io.to(data.roomId).emit('useActionSpace', updateResult);
           return;
         }
 
@@ -403,14 +421,14 @@ module.exports = function (io) {
             let updatedFacilityList = await gameService.getMainFacilityCards(
               data.roomId
             );
-            io.sockets.emit('useActionSpace', updatedFacilityList);
+            io.to(data.roomId).emit('useActionSpace', updatedFacilityList);
 
             // 주요설비를 사용한 플레이어의 상태 emit 필요
             let updatedPlayer = await gameService.getPlayerStatus(
               data.userId,
               data.roomId
             );
-            io.sockets.emit('useActionSpace', updatedPlayer);
+            io.to(data.roomId).emit('useActionSpace', updatedPlayer);
           } else if (isExist === 'sub') {
             // 총 emit 한 개(플레이어의 보조설비 리스트)
             // 보조설비를 사용한 플레이어의 상태 emit 필요
@@ -420,7 +438,7 @@ module.exports = function (io) {
               data.roomId,
               isExist
             );
-            io.sockets.emit('useActionSpace', updatedPlayer);
+            io.to(data.roomId).emit('useActionSpace', updatedPlayer);
           } else {
             response(baseResponse.NOT_ENOUGHDATA);
           }
@@ -429,7 +447,7 @@ module.exports = function (io) {
             data.userId,
             data.roomId
           );
-          io.sockets.emit('useActionSpace', updatedPlayer);
+          io.to(data.roomId).emit('useActionSpace', updatedPlayer);
         }
       }
       // 급한 가족 늘리기
@@ -453,9 +471,12 @@ module.exports = function (io) {
             data.userId,
             goodsList
           );
-          io.sockets.emit('useActionSpace', updateResult);
+          io.to(data.roomId).emit('useActionSpace', updateResult);
         } else {
-          io.sockets.emit('useActionSpace', baseResponse.NOT_ENOUGHDATA);
+          io.to(data.roomId).emit(
+            'useActionSpace',
+            baseResponse.NOT_ENOUGHDATA
+          );
         }
       } else if (data.actionName == 'Lessons') {
         let result = await gameService.updateJobCard(
@@ -475,15 +496,15 @@ module.exports = function (io) {
           data.goods[0],
         ]);
         if (updateResult.isSuccess == false) {
-          io.sockets.emit('useActionSpace', updateResult);
+          io.to(data.roomId).emit('useActionSpace', updateResult);
           return;
         }
         if (data.goods.length > 1) {
           updateResult = await utilities.sowSeed(data.userId, [data.goods[1]]);
-          io.sockets.emit('useActionSpace', updateResult);
+          io.to(data.roomId).emit('useActionSpace', updateResult);
           return;
         }
-        io.sockets.emit('useActionSpace', updateResult);
+        io.to(data.roomId).emit('useActionSpace', updateResult);
       }
       // 농장 개조하기
       else if (data.actionName === 'Farm redevelopment') {
@@ -493,7 +514,7 @@ module.exports = function (io) {
           data.goods
         );
         if (updateResult.isSuccess == false) {
-          io.sockets.emit('useActionSpace', updateResult);
+          io.to(roomId).emit('useActionSpace', updateResult);
           return;
         }
         // 그리고/또는 울타리 치기
@@ -502,7 +523,7 @@ module.exports = function (io) {
           data.goods[2].name = 'field';
           data.goods[2].isAdd = true;
           updateResult = await gameService.updateGoods(data.userId, data.goods);
-          io.sockets.emit('useActionSpace', updateResult);
+          io.to(data.roomId).emit('useActionSpace', updateResult);
         }
       } else if (data.actionName === 'Fencing') {
         let isHasCrashedSoil = await gameService.isHasCrashedSoil(
@@ -515,9 +536,9 @@ module.exports = function (io) {
               data.userId,
               data.goods
             );
-            io.sockets.emit('useActionSpace', updateResult);
+            io.to(data.roomId).emit('useActionSpace', updateResult);
           } else {
-            io.sockets.emit('useActionSpace', baseResponse.BAD_REQUEST);
+            io.to(data.roomId).emit('useActionSpace', baseResponse.BAD_REQUEST);
             return;
           }
           return;
@@ -527,9 +548,9 @@ module.exports = function (io) {
               data.userId,
               data.goods
             );
-            io.sockets.emit('useActionSpace', updateResult);
+            io.to(data.roomId).emit('useActionSpace', updateResult);
           } else {
-            io.sockets.emit('useActionSpace', baseResponse.BAD_REQUEST);
+            io.to(data.roomId).emit('useActionSpace', baseResponse.BAD_REQUEST);
             return;
           }
         }
@@ -539,7 +560,7 @@ module.exports = function (io) {
           data.userId,
           data.goods
         );
-        io.sockets.emit('useActionSpace', updateResult);
+        io.to(data.roomId).emit('useActionSpace', updateResult);
         io.sockets.emit('useActionSpace', updateResult);
       }
     }
@@ -579,7 +600,7 @@ module.exports = function (io) {
         io.sockets.emit('updatedRooms', updatedRooms);
         // TODO: 방 안에도 보내주는 emit 필요
         let playerInRoom = await roomService.findUserListByRoomId(roomId);
-        io.sockets.emit('exitRoom', playerInRoom);
+        io.to(roomId).emit('exitRoom', playerInRoom);
       } catch (err) {
         console.log(err);
         io.sockets.emit('exitRooms', errResponse(baseResponse.SERVER_ERROR));
@@ -669,7 +690,7 @@ module.exports = function (io) {
             io.sockets.emit('updatedRooms', updatedRooms);
             // TODO: 방 안에도 보내주는 emit 필요
             let playerInRoom = await roomService.findUserListByRoomId(roomId);
-            io.sockets.emit('joinRoom', playerInRoom);
+            io.to(roomId).emit('joinRoom', playerInRoom);
           }
         }
       } catch (err) {
@@ -707,7 +728,7 @@ module.exports = function (io) {
                 userId,
                 roomId
               );
-              io.sockets.emit('endCycle', getPlayerStatus);
+              io.to(roomId).emit('endCycle', getPlayerStatus);
             }
           }
         }
@@ -721,7 +742,7 @@ module.exports = function (io) {
       let roomId = data.roomId;
       let findUserList = await roomService.findUserListByRoomId(roomId);
       if (findUserList.length == 0) {
-        io.sockets.emit('startRound', baseResponse.BAD_REQUEST);
+        io.to(data.roomId).emit('startRound', baseResponse.BAD_REQUEST);
         return;
       }
       // 게임 순서 변경
@@ -730,7 +751,7 @@ module.exports = function (io) {
         roomId
       );
       if (updateOrderResult.isSuccess == false) {
-        io.sockets.emit('startRound', baseResponse.BAD_REQUEST);
+        io.to(data.roomId).emit('startRound', baseResponse.BAD_REQUEST);
         return;
       }
       // 구성물 수거 (소규모 농부, Small farmer)
@@ -742,7 +763,7 @@ module.exports = function (io) {
           'Small farmer'
         );
         if (usedJobCardResult.isSuccess == false) {
-          io.sockets.emit('startRound', baseResponse.BAD_REQUEST);
+          io.to(data.roomId).emit('startRound', baseResponse.BAD_REQUEST);
           return;
         }
         // 소규모 농부 사용되었다면
@@ -750,7 +771,7 @@ module.exports = function (io) {
           updateResult = await gameService.getPlayerStatus(userId, roomId);
         }
       }
-      io.sockets.emit('startRound', {
+      io.to(data.roomId).emit('startRound', {
         updateOrderResult,
         'Small Farmer': updateResult,
       });
@@ -761,14 +782,14 @@ module.exports = function (io) {
     }
 
     async function endRound(data) {
-      io.sockets.emit('endRound', 'endRound');
+      io.to(data.roomId).emit('endRound', 'endRound');
     }
 
     async function endGame(data) {
       let roomId = data.roomId;
       let calGameScoreResult = await gameService.calGameScore(roomId);
 
-      io.sockets.emit('endGame', calGameScoreResult);
+      io.to(data.roomId).emit('endGame', calGameScoreResult);
     }
   });
 };
