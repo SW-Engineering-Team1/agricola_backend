@@ -749,12 +749,13 @@ module.exports = function (io) {
         }
         // 소규모 농부 사용되었다면
         if (usedJobCardResult) {
-          updateResult = await gameService.getPlayerStatus(userId, roomId);
         }
+
+        updateResult.push(await gameService.getPlayerStatus(userId, roomId));
       }
       io.sockets.emit('startRound', {
         updateOrderResult,
-        'Small Farmer': updateResult,
+        updateResult,
       });
       // io.sockets.emit('startRound', {
       //   updateOrderResult,
