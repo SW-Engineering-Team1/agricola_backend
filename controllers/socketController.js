@@ -65,6 +65,10 @@ module.exports = function (io) {
         }
         let updatedPlayer = await gameService.updateGoods(userId, dataList);
         io.to(roomId).emit('useFacility', updatedPlayer);
+        test('sibal', (updatedPlayer) => {
+          console.log(updatedPlayer);
+          assert.equal(updatedPlayer.isSuccess, true);
+        });
       } else if (data.actionName == 'Hard ceramics') {
         if (data.goods[0].num == 2) {
           dataList = [

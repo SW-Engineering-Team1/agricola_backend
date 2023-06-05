@@ -2,16 +2,6 @@ module.exports = (sequelize, DataTypes) => {
   const GameStatus = sequelize.define(
     'GameStatuses',
     {
-      // roomId: {
-      //   type: DataTypes.INTEGER,
-      //   allowNull: false,
-      //   primaryKey: true,
-      // },
-      // userId: {
-      //   type: DataTypes.STRING(20),
-      //   allowNull: false,
-      //   primaryKey: true,
-      // },
       isMyTurn: {
         type: DataTypes.BOOLEAN,
       },
