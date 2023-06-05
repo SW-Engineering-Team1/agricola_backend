@@ -8,6 +8,7 @@ const sequelize = new Sequelize('sys', 'root', '1234', {
   dialect: 'mysql',
 });
 
+// 테스트에서 사용될 데이터베이스 연결 - 게임방
 const GameRoom = sequelize.define(
   'GameRoom',
   {
@@ -47,6 +48,7 @@ const GameRoom = sequelize.define(
   }
 );
 
+// 테스트에서 사용될 데이터베이스 연결 - 게임방 유저
 const GameStatus = sequelize.define(
   'GameStatuses',
   {
@@ -189,9 +191,10 @@ const GameStatus = sequelize.define(
   }
 );
 
-describe('my awesome project', () => {
+describe('Unit test', () => {
   let io, serverSocket, clientSocket;
 
+  // 테스트 전에 서버, 소켓, 데이터베이스 연결
   beforeAll((done) => {
     const httpServer = createServer();
     io = new Server(httpServer);
@@ -213,59 +216,368 @@ describe('my awesome project', () => {
     });
   });
 
+  // 테스트 후에 서버, 소켓, 데이터베이스 연결 해제
   afterAll(() => {
     io.close();
     clientSocket.close();
   });
 
-  test('should work', (done) => {
-    clientSocket.on('hello', async (arg) => {
-      // let tmp = JSON.parse(arg);
+  // 주요설비 사용 - 정상동작
+  test('use main facility - ok', (done) => {
+    clientSocket.on('test1', async () => {
+      // 주요 설비를 사용할 방 id
       let roomId = 2;
-      let userId = 'test1';
+
+      // 주요 설비를 사용할 유저 id
+      let userId = 'test2';
+
+      // 사용할 주요 설비 이름
       let goodsName = 'Stove';
+
+      // 에러를 위한 변수
+      let e;
+
+      // 업데이트 된 유저의 상태
+      let updatedStatus;
+
+      // 방이 존재하는지 확인
       const gameRoom = await GameRoom.findOne({
         where: {
           room_id: roomId,
         },
       });
-      // console.log(gameRoom.dataValues);
-      const playerStatus = await GameStatus.findOne({
-        where: {
-          roomId: roomId,
-          userId: userId,
-        },
-      });
-      // console.log(playerStatus.dataValues);
-      if (gameRoom.dataValues.remainedMainFacilityCard.includes(goodsName)) {
-        console.log('테스트 성공');
-        // 업데이트
-        const updatedRemainedMainFacilityCard =
-          gameRoom.dataValues.remainedMainFacilityCard.filter(
-            (card) => card != goodsName
-          );
-        const updatedUsedMainFacilityCard =
-          playerStatus.dataValues.usedMainFacilityCard.concat(goodsName);
-        await GameStatus.update(
-          {
-            usedMainFacilityCard: updatedUsedMainFacilityCard,
-          },
-          {
-            where: {
-              userId: userId,
-            },
-          }
-        );
+      if (!gameRoom) {
+        e = () => {
+          // 방이 존재하지 않으면 에러
+          throw new Error('NO_ROOM');
+        };
       } else {
-        console.log('테스트 실패');
+        const playerStatus = await GameStatus.findOne({
+          where: {
+            roomId: roomId,
+            userId: userId,
+          },
+        });
+        if (!playerStatus) {
+          e = () => {
+            // 유저가 존재하지 않으면 에러
+            throw new Error('NO_USER');
+          };
+        } else {
+          // 주요 설비가 남아있는지 확인
+          if (
+            gameRoom.dataValues.remainedMainFacilityCard.includes(goodsName)
+          ) {
+            // 사용 이후 남은 주요 설비
+            const updatedRemainedMainFacilityCard =
+              gameRoom.dataValues.remainedMainFacilityCard.filter(
+                (card) => card != goodsName
+              );
+            // 유저가 사용한 주요 설비
+            const updatedUsedMainFacilityCard =
+              playerStatus.dataValues.usedMainFacilityCard.concat(goodsName);
+            // 유저의 주요 설비 업데이트
+            await GameStatus.update(
+              {
+                usedMainFacilityCard: updatedUsedMainFacilityCard,
+              },
+              {
+                where: {
+                  userId: userId,
+                },
+              }
+            );
+            // 방의 주요 설비 업데이트
+            await GameRoom.update(
+              {
+                remainedMainFacilityCard: updatedRemainedMainFacilityCard,
+              },
+              {
+                where: {
+                  room_id: roomId,
+                },
+              }
+            );
+            updatedStatus = await GameStatus.findOne({
+              where: {
+                roomId: roomId,
+                userId: userId,
+              },
+            });
+          } else {
+            // 이미 사용한 주요 설비면 에러
+            e = () => {
+              throw new Error('ALREADY_USED');
+            };
+          }
+        }
       }
-      expect(arg).toBe('world');
+      expect(updatedStatus.dataValues.usedMainFacilityCard).toContain(
+        goodsName
+      );
       done();
     });
-    serverSocket.emit(
-      'hello',
-      // '{"roomId": 2, "userId": "test1", "goodsName": "테스트"}'
-      'world'
-    );
+    serverSocket.emit('test1');
+  });
+
+  // 주요설비 사용 - 방이 존재하지 않음
+  test('use main facility - no room', (done) => {
+    clientSocket.on('test2', async () => {
+      // 주요 설비를 사용할 방 id
+      let roomId = 11112;
+
+      // 주요 설비를 사용할 유저 id
+      let userId = 'test2';
+
+      // 사용할 주요 설비 이름
+      let goodsName = 'Stove';
+
+      // 에러를 위한 변수
+      let e;
+
+      // 방이 존재하는지 확인
+      const gameRoom = await GameRoom.findOne({
+        where: {
+          room_id: roomId,
+        },
+      });
+      if (!gameRoom) {
+        e = () => {
+          // 방이 존재하지 않으면 에러
+          throw new Error('NO_ROOM');
+        };
+      } else {
+        const playerStatus = await GameStatus.findOne({
+          where: {
+            roomId: roomId,
+            userId: userId,
+          },
+        });
+        if (!playerStatus) {
+          e = () => {
+            // 유저가 존재하지 않으면 에러
+            throw new Error('NO_USER');
+          };
+        } else {
+          // 주요 설비가 남아있는지 확인
+          if (
+            gameRoom.dataValues.remainedMainFacilityCard.includes(goodsName)
+          ) {
+            // 사용 이후 남은 주요 설비
+            const updatedRemainedMainFacilityCard =
+              gameRoom.dataValues.remainedMainFacilityCard.filter(
+                (card) => card != goodsName
+              );
+            // 유저가 사용한 주요 설비
+            const updatedUsedMainFacilityCard =
+              playerStatus.dataValues.usedMainFacilityCard.concat(goodsName);
+            // 유저의 주요 설비 업데이트
+            await GameStatus.update(
+              {
+                usedMainFacilityCard: updatedUsedMainFacilityCard,
+              },
+              {
+                where: {
+                  userId: userId,
+                },
+              }
+            );
+            // 방의 주요 설비 업데이트
+            await GameRoom.update(
+              {
+                remainedMainFacilityCard: updatedRemainedMainFacilityCard,
+              },
+              {
+                where: {
+                  room_id: roomId,
+                },
+              }
+            );
+          } else {
+            // 이미 사용한 주요 설비면 에러
+            e = () => {
+              throw new Error('ALREADY_USED');
+            };
+          }
+        }
+      }
+      expect(e).toThrowError('NO_ROOM');
+      done();
+    });
+    serverSocket.emit('test2');
+  });
+
+  // 주요설비 사용 - 유저가 존재하지 않음
+  test('use main facility - no user', (done) => {
+    clientSocket.on('test3', async () => {
+      // 주요 설비를 사용할 방 id
+      let roomId = 2;
+
+      // 주요 설비를 사용할 유저 id
+      let userId = '이런 이름은 없지용';
+
+      // 사용할 주요 설비 이름
+      let goodsName = 'Stove';
+
+      // 에러를 위한 변수
+      let e;
+
+      // 방이 존재하는지 확인
+      const gameRoom = await GameRoom.findOne({
+        where: {
+          room_id: roomId,
+        },
+      });
+      if (!gameRoom) {
+        e = () => {
+          // 방이 존재하지 않으면 에러
+          throw new Error('NO_ROOM');
+        };
+      } else {
+        const playerStatus = await GameStatus.findOne({
+          where: {
+            roomId: roomId,
+            userId: userId,
+          },
+        });
+        if (!playerStatus) {
+          e = () => {
+            // 유저가 존재하지 않으면 에러
+            throw new Error('NO_USER');
+          };
+        } else {
+          // 주요 설비가 남아있는지 확인
+          if (
+            gameRoom.dataValues.remainedMainFacilityCard.includes(goodsName)
+          ) {
+            // 사용 이후 남은 주요 설비
+            const updatedRemainedMainFacilityCard =
+              gameRoom.dataValues.remainedMainFacilityCard.filter(
+                (card) => card != goodsName
+              );
+            // 유저가 사용한 주요 설비
+            const updatedUsedMainFacilityCard =
+              playerStatus.dataValues.usedMainFacilityCard.concat(goodsName);
+            // 유저의 주요 설비 업데이트
+            await GameStatus.update(
+              {
+                usedMainFacilityCard: updatedUsedMainFacilityCard,
+              },
+              {
+                where: {
+                  userId: userId,
+                },
+              }
+            );
+            // 방의 주요 설비 업데이트
+            await GameRoom.update(
+              {
+                remainedMainFacilityCard: updatedRemainedMainFacilityCard,
+              },
+              {
+                where: {
+                  room_id: roomId,
+                },
+              }
+            );
+          } else {
+            // 이미 사용한 주요 설비면 에러
+            e = () => {
+              throw new Error('ALREADY_USED');
+            };
+          }
+        }
+      }
+      expect(e).toThrowError('NO_USER');
+      done();
+    });
+    serverSocket.emit('test3');
+  });
+
+  // 주요설비 사용 - 이미 사용한 설비
+  test('use main facility - already used', (done) => {
+    clientSocket.on('test4', async () => {
+      // 주요 설비를 사용할 방 id
+      let roomId = 2;
+
+      // 주요 설비를 사용할 유저 id
+      let userId = 'test2';
+
+      // 사용할 주요 설비 이름
+      let goodsName = 'Stove';
+
+      // 에러를 위한 변수
+      let e;
+
+      // 방이 존재하는지 확인
+      const gameRoom = await GameRoom.findOne({
+        where: {
+          room_id: roomId,
+        },
+      });
+      if (!gameRoom) {
+        e = () => {
+          // 방이 존재하지 않으면 에러
+          throw new Error('NO_ROOM');
+        };
+      } else {
+        const playerStatus = await GameStatus.findOne({
+          where: {
+            roomId: roomId,
+            userId: userId,
+          },
+        });
+        if (!playerStatus) {
+          e = () => {
+            // 유저가 존재하지 않으면 에러
+            throw new Error('NO_USER');
+          };
+        } else {
+          // 주요 설비가 남아있는지 확인
+          if (
+            gameRoom.dataValues.remainedMainFacilityCard.includes(goodsName)
+          ) {
+            // 사용 이후 남은 주요 설비
+            const updatedRemainedMainFacilityCard =
+              gameRoom.dataValues.remainedMainFacilityCard.filter(
+                (card) => card != goodsName
+              );
+            // 유저가 사용한 주요 설비
+            const updatedUsedMainFacilityCard =
+              playerStatus.dataValues.usedMainFacilityCard.concat(goodsName);
+            // 유저의 주요 설비 업데이트
+            await GameStatus.update(
+              {
+                usedMainFacilityCard: updatedUsedMainFacilityCard,
+              },
+              {
+                where: {
+                  userId: userId,
+                },
+              }
+            );
+            // 방의 주요 설비 업데이트
+            await GameRoom.update(
+              {
+                remainedMainFacilityCard: updatedRemainedMainFacilityCard,
+              },
+              {
+                where: {
+                  room_id: roomId,
+                },
+              }
+            );
+          } else {
+            // 이미 사용한 주요 설비면 에러
+            e = () => {
+              throw new Error('ALREADY_USED');
+            };
+          }
+        }
+      }
+      expect(e).toThrowError('ALREADY_USED');
+      done();
+    });
+    serverSocket.emit('test4');
   });
 });
