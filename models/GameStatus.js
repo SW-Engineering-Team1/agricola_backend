@@ -104,8 +104,8 @@ module.exports = (sequelize, DataTypes) => {
         defaultValue: 0,
       },
       field: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
+        type: DataTypes.JSON,
+        defaultValue: [],
       },
       usingField: {
         type: DataTypes.INTEGER,
