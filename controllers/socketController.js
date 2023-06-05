@@ -718,28 +718,28 @@ module.exports = function (io) {
           io.sockets.emit('endCycle', result);
           return;
         }
-        // 음식 지불
-        else {
-          result = await gameService.payFood(userId, roomId);
-          if (result.isSuccess === false) {
-            io.sockets.emit('endCycle', result);
-            return;
-          }
-          // 가축 번식
-          else {
-            result = await gameService.breedAnimal(userId, roomId);
-            if (result.isSuccess === false) {
-              io.sockets.emit('endCycle', result);
-              return;
-            } else {
-              let getPlayerStatus = await gameService.getPlayerStatus(
-                userId,
-                roomId
-              );
-              io.to(roomId).emit('endCycle', getPlayerStatus);
-            }
-          }
-        }
+        // // 음식 지불
+        // else {
+        //   result = await gameService.payFood(userId, roomId);
+        //   if (result.isSuccess === false) {
+        //     io.sockets.emit('endCycle', result);
+        //     return;
+        //   }
+        //   // 가축 번식
+        //   else {
+        //     result = await gameService.breedAnimal(userId, roomId);
+        //     if (result.isSuccess === false) {
+        //       io.sockets.emit('endCycle', result);
+        //       return;
+        //     } else {
+        //       let getPlayerStatus = await gameService.getPlayerStatus(
+        //         userId,
+        //         roomId
+        //       );
+        //       io.to(roomId).emit('endCycle', getPlayerStatus);
+        //     }
+        //   }
+        // }
       } catch (err) {
         console.log(err);
         io.sockets.emit('endCycle', errResponse(baseResponse.SERVER_ERROR));

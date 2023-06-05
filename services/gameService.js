@@ -402,29 +402,28 @@ module.exports = {
         roomId,
       },
     });
-    let data = [];
-    data.push({
-      name: 'vegeOnField',
-      num: playerDetail.dataValues.vegeOnField,
-      isAdd: false,
-    });
-    data.push({
-      name: 'vegeOnStorage',
-      num: playerDetail.dataValues.vegeOnField,
-      isAdd: true,
-    });
-    data.push({
-      name: 'grainOnField',
-      num: playerDetail.dataValues.grainOnField,
-      isAdd: false,
-    });
-    data.push({
-      name: 'grainOnStorage',
-      num: playerDetail.dataValues.grainOnField,
-      isAdd: true,
-    });
 
+    let data = [];
+    let field = [];
+    for (let element of playerDetail.dataValues.field) {
+      if (element.remainedNum != 0) {
+        data.push({ name: element.kind + 'OnStorage', num: 1, isAdd: true });
+        element.remainedNum -= 1;
+      }
+      field.push(element);
+    }
     try {
+      await GameStatus.update(
+        {
+          field: field,
+        },
+        {
+          where: {
+            userId: userId,
+            roomId,
+          },
+        }
+      );
       let result = await this.updateGoods(userId, data);
       return response(baseResponse.SUCCESS, result);
     } catch (err) {

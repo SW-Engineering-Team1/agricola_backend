@@ -55,14 +55,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
-      grainOnField: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
-      vegeOnField: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
       grainDoing: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
@@ -106,10 +98,6 @@ module.exports = (sequelize, DataTypes) => {
       field: {
         type: DataTypes.JSON,
         defaultValue: [],
-      },
-      usingField: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
       },
       food: {
         type: DataTypes.INTEGER,
