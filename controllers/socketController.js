@@ -53,7 +53,8 @@ module.exports = function (io) {
               isAdd: true,
             },
           ];
-        } else if (data.goods[0].name === 'vegeOnStorage') {
+        } else if (data.goods[0].name === 'vege') {
+          data.goods[0].name = 'vegeOnStorage';
           dataList = [
             data.goods[0],
             {
@@ -124,7 +125,8 @@ module.exports = function (io) {
               isAdd: true,
             },
           ];
-        } else if (data.goods[0].name === 'vegeOnStorage') {
+        } else if (data.goods[0].name === 'vege') {
+          data.goods[0].name = 'vegeOnStorage';
           dataList = [
             data.goods[0],
             {
@@ -732,6 +734,13 @@ module.exports = function (io) {
         io.sockets.emit('startRound', baseResponse.BAD_REQUEST);
         return;
       }
+      // 아기 성장
+      let growBabyResult = await gameService.growBaby(findUserList, roomId);
+      if (growBabyResult.isSuccess == false) {
+        io.sockets.emit('startRound', growBabyResult);
+        return;
+      }
+
       // 게임 순서 변경
       let updateOrderResult = await gameService.updateOrder(
         findUserList,
@@ -755,12 +764,13 @@ module.exports = function (io) {
         }
         // 소규모 농부 사용되었다면
         if (usedJobCardResult) {
-          updateResult = await gameService.getPlayerStatus(userId, roomId);
         }
+
+        updateResult.push(await gameService.getPlayerStatus(userId, roomId));
       }
       io.sockets.emit('startRound', {
         updateOrderResult,
-        'Small Farmer': updateResult,
+        updateResult,
       });
       // io.sockets.emit('startRound', {
       //   updateOrderResult,

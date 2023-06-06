@@ -923,6 +923,27 @@ module.exports = {
       return baseResponse.DB_ERROR;
     }
   },
+  growBaby: async function (userList, roomId) {
+    try {
+      for (let userId of userList) {
+        let status = await this.getPlayerStatus(userId, roomId);
+        let baby = status.baby;
+        let family = status.family;
+        family += baby;
+        await GameStatus.update(
+          {
+            baby: 0,
+            family: family,
+                        },
+          }
+        );
+      }
+      return true;
+      } catch (err) {
+      console.log(err);
+      return baseResponse.DB_ERROR;
+    }
+  },
   getUserField: async function (userId, roomId) {
     try {
       let findResult = await GameStatus.findOne({
