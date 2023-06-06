@@ -930,10 +930,17 @@ module.exports = {
         let baby = status.baby;
         let family = status.family;
         family += baby;
-        await GameStatus.update({
-          baby: 0,
-          family: family,
-        });
+        await GameStatus.update(
+          {
+            baby: 0,
+            family: family,
+          },
+          {
+            where: {
+              userId,
+            },
+          }
+        );
       }
       return true;
     } catch (err) {
