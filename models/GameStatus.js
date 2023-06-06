@@ -55,14 +55,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
-      grainDoing: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
-      vegeDoing: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
       remainedFence: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
