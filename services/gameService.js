@@ -23,7 +23,10 @@ module.exports = {
   updateGoods: async function (userId, goodsList) {
     try {
       for (const goods of goodsList) {
-        const { name, num, isAdd } = goods;
+        let { name, num, isAdd } = goods;
+        if (name == 'grain' || name == 'vege') {
+          name += 'OnStorage';
+        }
         await GameStatus.update(
           {
             [name]: sequelize.literal(`${name} ${isAdd ? '+' : '-'} ${num}`),
