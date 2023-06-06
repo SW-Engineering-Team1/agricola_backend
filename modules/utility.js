@@ -2,20 +2,54 @@ const baseResponse = require('../config/baseResponseStatus');
 const gameService = require('../services/gameService');
 
 module.exports = {
-  sowSeed: async function (userId, goodsList) {
-    let tmp = JSON.parse(JSON.stringify(goodsList));
-    tmp[0].name = tmp[0].name + 'OnStorage';
+  sowSeed: async function (userId, roomId, goodsList) {
+    let updateResult;
 
-    let updateResult = await gameService.updateGoods(userId, tmp);
-    if (updateResult.isSuccess == false) {
-      return updateResult;
+    let checkFieldExist = await gameService.checkFieldExist(
+      userId,
+      roomId,
+      goodsList[1].id
+    );
+
+    if (checkFieldExist == false) {
+      return baseResponse.BAD_REQUEST;
     }
-    // console.log(abc.isSuccess);
 
-    goodsList[0].name = goodsList[0].name + 'Doing';
-    goodsList[0].isAdd = true;
+    let canCultivate = await gameService.canCultivate(
+      userId,
+      roomId,
+      goodsList[1].id
+    );
 
-    return gameService.updateGoods(userId, goodsList);
+    if (canCultivate == false) {
+      return baseResponse.BAD_REQUEST;
+    }
+
+    goodsList[0].name = goodsList[0].name + 'OnStorage';
+    updateResult = await gameService.updateGoods(userId, [goodsList[0]]);
+
+    if (goodsList[0].name === 'grainOnStorage') {
+      let field = {
+        id: goodsList[1].id,
+        kind: goodsList[1].kind,
+        remainedNum: goodsList[0].num * 3,
+      };
+      console.log(field);
+      await gameService.SowField(userId, roomId, field);
+    } else if (goodsList[0].name === 'vegeOnStorage') {
+      let field = {
+        id: goodsList[1].id,
+        kind: goodsList[1].kind,
+        remainedNum: goodsList[0].num * 2,
+      };
+      await gameService.SowField(userId, roomId, field);
+    } else {
+      return baseResponse.BAD_REQUEST;
+    }
+
+    updateResult = await gameService.getPlayerStatus(userId, roomId);
+
+    return updateResult;
   },
 
   bakeBread: async function (userId, goodsList) {

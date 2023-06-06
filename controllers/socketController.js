@@ -65,11 +65,7 @@ module.exports = function (io) {
           ];
         }
         let updatedPlayer = await gameService.updateGoods(userId, dataList);
-        io.sockets.emit('useFacility', updatedPlayer);
-        test('sibal', (updatedPlayer) => {
-          console.log(updatedPlayer);
-          assert.equal(updatedPlayer.isSuccess, true);
-        });
+        io.to(roomId).emit('useFacility', updatedPlayer);
       } else if (data.actionName == 'Hard ceramics') {
         if (data.goods[0].num == 2) {
           dataList = [
@@ -238,8 +234,12 @@ module.exports = function (io) {
       }
       // 씨뿌리기 이벤트
       else if (data.actionName === 'Grain Utilization') {
-        let updateResult = await utilities.sowSeed(data.userId, data.goods);
-        io.sockets.emit('useActionSpace', updateResult);
+        let updateResult = await utilities.sowSeed(
+          data.userId,
+          data.roomId,
+          data.goods
+        );
+        io.to(data.roomId).emit('useActionSpace', updateResult);
       }
       // 빵 굽기 이벤트
       else if (data.actionName === 'Bake Bread') {
@@ -535,10 +535,18 @@ module.exports = function (io) {
             return;
           }
         }
+      } else if (data.actionName === 'Add Field') {
+        let updateResult = await gameService.addField(
+          data.userId,
+          data.roomId,
+          data.goods[0]
+        );
+        io.to(data.roomId).emit('useActionSpace', updateResult);
       } else {
         // else
         let updateResult = await gameService.updateGoods(
           data.userId,
+          data.roomId,
           data.goods
         );
         io.sockets.emit('useActionSpace', updateResult);
