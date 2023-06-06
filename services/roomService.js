@@ -23,64 +23,6 @@ module.exports = {
     }
   },
 
-  patchGameStatus: async (data) => {
-    // 기존 정보 파기
-    try {
-      await GameStatus.destroy({
-        where: {
-          room_id: data.roomId,
-          user_id: data.userId,
-        },
-      });
-    } catch (err) {
-      console.log(err);
-      return errResponse(baseResponse.DB_ERROR);
-    }
-
-    try {
-      let gameStatus = await GameStatus.create({
-        room_id: data.roomId,
-        user_id: data.userId,
-        is_my_turn: data.isMyTurn,
-        order_num: data.orderNum,
-        sheep_num: data.sheepNum,
-        pig_num: data.pigNum,
-        cow_num: data.cowNum,
-        wood_num: data.woodNum,
-        sand_num: data.sandNum,
-        reed_num: data.reedNum,
-        stone_num: data.stoneNum,
-        grain_on_storage_num: data.grainOnStorageNum,
-        vege_on_storage_num: data.vegeOnStorageNum,
-        grain_on_field_num: data.grainOnFieldNum,
-        vege_on_field_num: data.vegeOnFieldNum,
-        grain_doing_num: data.grainDoingNum,
-        vege_doing_num: data.vegeDoingNum,
-        remained_fence: data.remainedFence,
-        remained_barn: data.remainedBarn,
-        remained_family: data.remainedFamily,
-        adult_num: data.adultNum,
-        baby_num: data.babyNum,
-        wood_house_num: data.woodHouseNum,
-        sand_house_num: data.sandHouseNum,
-        stone_house_num: data.stoneHouseNum,
-        field_num: data.fieldNum,
-        food_num: data.foodNum,
-        remained_job_card: data.remainedJobCard,
-        used_job_card: data.usedJobCard,
-        remained_main_facility_card: data.remainedMainFacilityCard,
-        used_main_facility_card: data.usedMainFacilityCard,
-        remained_sub_facility_card: data.remainedSubFacilityCard,
-        used_sub_facility_card: data.usedSubFacilityCard,
-        num_of_begging_token: data.numOfBeggingToken,
-      });
-      return response(baseResponse.SUCCESS, gameStatus);
-    } catch (err) {
-      console.log(err);
-      return errResponse(baseResponse.DB_ERROR);
-    }
-  },
-
   createRoom: async (roomName, limitNum, hostId) => {
     try {
       await GameRoom.create({

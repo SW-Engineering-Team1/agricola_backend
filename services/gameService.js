@@ -402,29 +402,28 @@ module.exports = {
         roomId,
       },
     });
-    let data = [];
-    data.push({
-      name: 'vegeOnField',
-      num: playerDetail.dataValues.vegeOnField,
-      isAdd: false,
-    });
-    data.push({
-      name: 'vegeOnStorage',
-      num: playerDetail.dataValues.vegeOnField,
-      isAdd: true,
-    });
-    data.push({
-      name: 'grainOnField',
-      num: playerDetail.dataValues.grainOnField,
-      isAdd: false,
-    });
-    data.push({
-      name: 'grainOnStorage',
-      num: playerDetail.dataValues.grainOnField,
-      isAdd: true,
-    });
 
+    let data = [];
+    let field = [];
+    for (let element of playerDetail.dataValues.field) {
+      if (element.remainedNum != 0) {
+        data.push({ name: element.kind + 'OnStorage', num: 1, isAdd: true });
+        element.remainedNum -= 1;
+      }
+      field.push(element);
+    }
     try {
+      await GameStatus.update(
+        {
+          field: field,
+        },
+        {
+          where: {
+            userId: userId,
+            roomId,
+          },
+        }
+      );
       let result = await this.updateGoods(userId, data);
       return response(baseResponse.SUCCESS, result);
     } catch (err) {
@@ -527,6 +526,7 @@ module.exports = {
             'Log boat',
           ],
           usedSubFacilityCard: [],
+          field: [],
         });
       } catch (err) {
         console.log(err);
@@ -561,6 +561,7 @@ module.exports = {
             'Thick forest',
           ],
           usedSubFacilityCard: [],
+          field: [],
         });
       } catch (err) {
         console.log(err);
@@ -572,14 +573,16 @@ module.exports = {
         {
           status: 'STARTED',
           remainedMainFacilityCard: [
-            'Stove',
-            'Brazier',
+            'Brazier1',
+            'Brazier2',
+            'Stove1',
+            'Stove2',
+            'Well',
             'Earthen kiln',
             'Stone kiln',
             'Furniture factory',
             'Bowl factory',
             'Basket factory',
-            'Well',
           ],
         },
         {
@@ -915,6 +918,94 @@ module.exports = {
         },
       });
       return findResult.dataValues;
+    } catch (err) {
+      console.log(err);
+      return baseResponse.DB_ERROR;
+    }
+  },
+  getUserField: async function (userId, roomId) {
+    try {
+      let findResult = await GameStatus.findOne({
+        where: {
+          userId,
+          roomId,
+        },
+      });
+      return findResult.dataValues.field;
+    } catch (err) {
+      console.log(err);
+      return baseResponse.DB_ERROR;
+    }
+  },
+  addField: async function (userId, roomId, field) {
+    let currentField = await this.getUserField(userId, roomId);
+    if (!(await this.checkFieldExist(userId, roomId, field.id))) {
+      currentField = currentField.concat(field);
+      try {
+        await GameStatus.update(
+          {
+            field: currentField,
+          },
+          {
+            where: {
+              userId,
+              roomId,
+            },
+          }
+        );
+        return response(baseResponse.SUCCESS);
+      } catch (err) {
+        console.log(err);
+        return baseResponse.DB_ERROR;
+      }
+    } else {
+      return errResponse(baseResponse.BAD_REQUEST);
+    }
+  },
+  checkFieldExist: async function (userId, roomId, fieldId) {
+    let currentField = await this.getUserField(userId, roomId);
+    let flag = false;
+    currentField.forEach((element) => {
+      if (element.id === fieldId) {
+        flag = true;
+      }
+    });
+    return flag;
+  },
+  canCultivate: async function (userId, roomId, fieldId) {
+    let currentField = await this.getUserField(userId, roomId);
+    let flag = true;
+    currentField.forEach((element) => {
+      if (element.id === fieldId) {
+        if (element.remainedNum > 0) {
+          flag = false;
+        }
+      }
+    });
+    return flag;
+  },
+  SowField: async function (userId, roomId, field) {
+    let currentField = await this.getUserField(userId, roomId);
+    currentField.forEach((element) => {
+      if (element.id === field.id) {
+        element.remainedNum = field.remainedNum;
+        element.kind = field.kind;
+      }
+    });
+
+    try {
+      await GameStatus.update(
+        {
+          field: currentField,
+        },
+        {
+          where: {
+            userId,
+            roomId,
+          },
+        }
+      );
+      return response(baseResponse.SUCCESS);
     } catch (err) {
       console.log(err);
       return baseResponse.DB_ERROR;
