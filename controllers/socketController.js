@@ -543,10 +543,8 @@ module.exports = function (io) {
         );
         io.to(data.roomId).emit('useActionSpace', updateResult);
       } else {
-        // else
         let updateResult = await gameService.updateGoods(
           data.userId,
-          data.roomId,
           data.goods
         );
         io.sockets.emit('useActionSpace', updateResult);
