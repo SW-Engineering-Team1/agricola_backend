@@ -20,7 +20,7 @@ module.exports = {
     }
     return true;
   },
-  updateGoods: async function (userId, roomId, goodsList) {
+  updateGoods: async function (userId, goodsList) {
     try {
       for (const goods of goodsList) {
         let { name, num, isAdd } = goods;
