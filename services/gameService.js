@@ -666,6 +666,7 @@ module.exports = {
         let findResult = await GameStatus.findOne({
           where: {
             order: i,
+            roomId,
           },
           attributes: ['userId'],
         });
