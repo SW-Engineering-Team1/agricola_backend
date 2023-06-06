@@ -177,10 +177,10 @@ module.exports = function (io) {
           return;
         } else {
           await gameService.startGame(roomId, userId);
+          let gameStatus = await roomService.getGameStatus(data[0].roomId);
+          io.sockets.emit('startGame', gameStatus);
         }
       });
-      let gameStatus = await roomService.getGameStatus(data[0].roomId);
-      io.sockets.emit('startGame', gameStatus);
 
       let updatedRooms = await roomService.getRooms();
       io.sockets.emit('updatedRooms', updatedRooms);
