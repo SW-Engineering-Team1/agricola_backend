@@ -548,7 +548,6 @@ module.exports = function (io) {
           data.goods
         );
         io.sockets.emit('useActionSpace', updateResult);
-        io.sockets.emit('useActionSpace', updateResult);
       }
     }
 
