@@ -930,16 +930,13 @@ module.exports = {
         let baby = status.baby;
         let family = status.family;
         family += baby;
-        await GameStatus.update(
-          {
-            baby: 0,
-            family: family,
-                        },
-          }
-        );
+        await GameStatus.update({
+          baby: 0,
+          family: family,
+        });
       }
       return true;
-      } catch (err) {
+    } catch (err) {
       console.log(err);
       return baseResponse.DB_ERROR;
     }
