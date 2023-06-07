@@ -21,6 +21,7 @@ module.exports = function (io) {
 
     socket.on('endGame', endGame);
     socket.on('skipGame', skipGame);
+    socket.on('accumulateGoods', accumulateGoods);
 
     async function useFacility(data) {
       let userId = data.userId;
@@ -543,6 +544,35 @@ module.exports = function (io) {
           data.goods[0]
         );
         io.to(data.roomId).emit('useActionSpace', updateResult);
+      }
+      // 누적칸 사용하기
+      else if (data.actionName === 'Use Accumulated Goods') {
+        const excludedWord = 'Accumulated';
+
+        const regexPattern = new RegExp(`${excludedWord}.*`, 'i');
+
+        const extractedString = data.goods[0].name.replace(regexPattern, '');
+
+        let accResult = await gameService.useAccumulatedGoods(
+          data.roomId,
+          data.goods[0].name
+        );
+        if (accResult.isSuccess === false) {
+          io.sockets.emit('useActionSpace', accResult);
+          return;
+        }
+        data.goods[0].name = extractedString;
+
+        let updateResult = await gameService.updateGoods(
+          data.userId,
+          data.goods
+        );
+
+        if (updateResult.isSuccess === false) {
+          io.sockets.emit('useActionSpace', updateResult);
+          return;
+        }
+        io.sockets.emit('useActionSpace', { accResult, updateResult });
       } else {
         let updateResult = await gameService.updateGoods(
           data.userId,
@@ -760,9 +790,6 @@ module.exports = function (io) {
           io.sockets.emit('startRound', baseResponse.BAD_REQUEST);
           return;
         }
-        // 소규모 농부 사용되었다면
-        if (usedJobCardResult) {
-        }
 
         updateResult.push(await gameService.getPlayerStatus(userId, roomId));
       }
@@ -825,6 +852,13 @@ module.exports = function (io) {
           io.sockets.emit('skipGame', errResponse(baseResponse.SERVER_ERROR));
         }
       }
+    }
+
+    async function accumulateGoods(data) {
+      let roomId = data.roomId;
+      let accList = data.accList;
+      let updateResult = await gameService.accumulateGoods(roomId, accList);
+      io.sockets.emit('accumulateGoods', updateResult);
     }
   });
 };

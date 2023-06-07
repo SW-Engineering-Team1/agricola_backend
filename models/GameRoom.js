@@ -32,6 +32,42 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.JSON,
         defaultValue: [],
       },
+      woodAccumulated: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      sandAccumulated: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      reedAccumulated: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      foodAccumulated: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      sheepAccumulated: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      stoneAccumulatedWest: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      pigAccumulated: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      cowAccumulated: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
+      stoneAccumulatedEast: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
     },
     {
       timestamps: false,
