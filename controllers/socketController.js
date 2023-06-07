@@ -20,6 +20,7 @@ module.exports = function (io) {
     socket.on('endTurn', endTurn);
 
     socket.on('endGame', endGame);
+    socket.on('skipGame', skipGame);
 
     async function useFacility(data) {
       let userId = data.userId;
@@ -472,21 +473,21 @@ module.exports = function (io) {
         io.sockets.emit('useActionSpace', updateResult);
       }
       // 밭 농사하기
-      else if (data.actionName === 'Cultivation') {
-        let updateResult = await gameService.updateGoods(data.userId, [
-          data.goods[0],
-        ]);
-        if (updateResult.isSuccess == false) {
-          io.sockets.emit('useActionSpace', updateResult);
-          return;
-        }
-        if (data.goods.length > 1) {
-          updateResult = await utilities.sowSeed(data.userId, [data.goods[1]]);
-          io.sockets.emit('useActionSpace', updateResult);
-          return;
-        }
-        io.sockets.emit('useActionSpace', updateResult);
-      }
+      // else if (data.actionName === 'Cultivation') {
+      //   let updateResult = await gameService.updateGoods(data.userId, [
+      //     data.goods[0],
+      //   ]);
+      //   if (updateResult.isSuccess == false) {
+      //     io.sockets.emit('useActionSpace', updateResult);
+      //     return;
+      //   }
+      //   if (data.goods.length > 1) {
+      //     updateResult = await utilities.sowSeed(data.userId, [data.goods[1]]);
+      //     io.sockets.emit('useActionSpace', updateResult);
+      //     return;
+      //   }
+      //   io.sockets.emit('useActionSpace', updateResult);
+      // }
       // 농장 개조하기
       else if (data.actionName === 'Farm redevelopment') {
         let updateResult = await utilities.fixHouse(
@@ -784,6 +785,46 @@ module.exports = function (io) {
       let calGameScoreResult = await gameService.calGameScore(roomId);
 
       io.sockets.emit('endGame', calGameScoreResult);
+    }
+
+    async function skipGame(data) {
+      // data 형식
+      // {
+      //   "roomId": 1,
+      //   "skipRound": 8,
+      //   "userId": [
+      //       {"userId": "test1"},
+      //       {"userId": "test2"}
+      //     ]
+      //  }
+      // 시나리오 기준, P1(빨)이 무조건 userId List의 첫번째에 위치해야 함
+
+      roomId = data.roomId;
+      let i = 0;
+      for (let obj of data.userId) {
+        try {
+          let userId = obj.userId;
+          let result = await gameService.skipGame(
+            data.roomId,
+            userId,
+            data.skipRound,
+            i
+          );
+          i++;
+          if (result.isSuccess === false) {
+            io.sockets.emit('skipGame', result);
+          } else {
+            let updatedPlayer = await gameService.getPlayerStatus(
+              userId,
+              roomId
+            );
+            io.sockets.emit('skipGame', updatedPlayer);
+          }
+        } catch (err) {
+          console.log(err);
+          io.sockets.emit('skipGame', errResponse(baseResponse.SERVER_ERROR));
+        }
+      }
     }
   });
 };
