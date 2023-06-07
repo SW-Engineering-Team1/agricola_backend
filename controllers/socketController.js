@@ -544,6 +544,35 @@ module.exports = function (io) {
           data.goods[0]
         );
         io.to(data.roomId).emit('useActionSpace', updateResult);
+      }
+      // 누적칸 사용하기
+      else if (data.actionName === 'Use Accumulated Goods') {
+        const excludedWord = 'Accumulated';
+
+        const regexPattern = new RegExp(`${excludedWord}.*`, 'i');
+
+        const extractedString = data.goods[0].name.replace(regexPattern, '');
+
+        let accResult = await gameService.useAccumulatedGoods(
+          data.roomId,
+          data.goods[0].name
+        );
+        if (accResult.isSuccess === false) {
+          io.sockets.emit('useActionSpace', accResult);
+          return;
+        }
+        data.goods[0].name = extractedString;
+
+        let updateResult = await gameService.updateGoods(
+          data.userId,
+          data.goods
+        );
+
+        if (updateResult.isSuccess === false) {
+          io.sockets.emit('useActionSpace', updateResult);
+          return;
+        }
+        io.sockets.emit('useActionSpace', { accResult, updateResult });
       } else {
         let updateResult = await gameService.updateGoods(
           data.userId,

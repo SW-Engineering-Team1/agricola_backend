@@ -1220,4 +1220,41 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
+  useAccumulatedGoods: async function (roomId, goodsName) {
+    try {
+      await GameRooms.update(
+        {
+          // use goodsName as column name
+          [goodsName]: 0,
+        },
+        {
+          where: {
+            room_id: roomId,
+          },
+        }
+      );
+
+      let accList = [
+        'woodAccumulated',
+        'sandAccumulated',
+        'reedAccumulated',
+        'foodAccumulated',
+        'sheepAccumulated',
+        'stoneAccumulatedWest',
+        'pigAccumulated',
+        'cowAccumulated',
+        'stoneAccumulatedEast',
+      ];
+      let result = await GameRooms.findOne({
+        where: {
+          room_id: roomId,
+        },
+        attributes: accList,
+      });
+      return response(baseResponse.SUCCESS, result.dataValues);
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
 };
