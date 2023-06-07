@@ -507,6 +507,7 @@ module.exports = {
           UserId: userId,
           isMyTurn: true,
           order: 1,
+          food: 3,
           nextOrder: 1,
           remainedJobCard: [
             'Small farmer',
@@ -542,6 +543,7 @@ module.exports = {
           UserId: userId,
           isMyTurn: false,
           order: 2,
+          food: 2,
           nextOrder: 2,
           remainedJobCard: [
             'Counselor',
