@@ -1040,4 +1040,157 @@ module.exports = {
       return baseResponse.DB_ERROR;
     }
   },
+  skipGame: async function (roomId, userId, roundNum, i) {
+    if (roundNum == 8) {
+      try {
+        await GameRooms.update(
+          {
+            remainedMainFacilityCard: [
+              'Brazier1',
+              'Brazier2',
+              'Stove2',
+              'Well',
+              'Stone kiln',
+              'Furniture factory',
+              'Bowl factory',
+              'Basket factory',
+            ],
+          },
+          {
+            where: {
+              room_id: roomId,
+            },
+          }
+        );
+        if (i == 0) {
+          await GameStatus.update(
+            {
+              isMyTurn: false,
+              order: 2,
+              nextOrder: 2,
+              sheep: 5,
+              pig: 0,
+              cow: 0,
+              wood: 3,
+              fence: 3,
+              cageArea: 8,
+              sand: 0,
+              reed: 5,
+              stone: 0,
+              grainOnStorage: 1,
+              vegeOnStorage: 0,
+              family: 2,
+              baby: 0,
+              woodHouse: 2,
+              sandHouse: 0,
+              stoneHouse: 0,
+              field: [
+                {
+                  id: 1,
+                  kind: 'grain',
+                  remainedNum: 1,
+                },
+              ],
+              food: 1,
+              remainedJobCard: [
+                'Walled workman',
+                'Roof mower',
+                'Adoptive parents',
+                'Woodcutter',
+                'Merchandiser',
+                'Organic farmer',
+              ],
+              usedJobCard: ['Small farmer'],
+              usedMainFacilityCard: ['Earthen kiln'],
+              remainedSubFacilityCard: [
+                'Hard ceramic',
+                'Carpenter room',
+                'Corn shovel',
+                'Threshing plate',
+                'Clay mine',
+                'Street vendor',
+                'Log boat',
+              ],
+              usedSubFacilityCard: [],
+              numOfBeggingToken: 0,
+            },
+            {
+              where: {
+                userId,
+                roomId,
+              },
+            }
+          );
+        } else {
+          await GameStatus.update(
+            {
+              isMyTurn: true,
+              order: 1,
+              nextOrder: 1,
+              sheep: 0,
+              pig: 0,
+              cow: 0,
+              wood: 2,
+              fence: 7,
+              cageArea: 3,
+              sand: 2,
+              reed: 2,
+              stone: 0,
+              grainOnStorage: 1,
+              vegeOnStorage: 0,
+              family: 2,
+              baby: 0,
+              woodHouse: 2,
+              sandHouse: 0,
+              stoneHouse: 0,
+              field: [
+                {
+                  id: 1,
+                  kind: '',
+                  remainedNum: 0,
+                },
+              ],
+              food: 0,
+              remainedJobCard: [
+                'Palanquinist',
+                'Subsidiary farmer',
+                'Hedge keeper',
+                'Servant',
+                'Plowman',
+              ],
+              usedJobCard: ['Counselor', 'Property manager'],
+              usedMainFacilityCard: ['Stove1'],
+              remainedSubFacilityCard: [
+                'Manger',
+                'Bottle',
+                'Kitchen room',
+                'Field of beans',
+                'Junkyard',
+                'Thick forest',
+              ],
+              usedSubFacilityCard: ['Crushed soil'],
+              numOfBeggingToken: 0,
+            },
+            {
+              where: {
+                userId,
+                roomId,
+              },
+            }
+          );
+        }
+      } catch (err) {
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR);
+      }
+      return response(baseResponse.SUCCESS);
+    }
+    // Bae should do this ☹️
+    else if (roundNum == 14) {
+      console.log('round 14');
+      return response(baseResponse.SUCCESS);
+    } else {
+      return errResponse(baseResponse.BAD_REQUEST);
+    }
+  },
 };
