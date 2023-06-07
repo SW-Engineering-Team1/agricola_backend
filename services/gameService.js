@@ -1196,16 +1196,29 @@ module.exports = {
   accumulateGoods: async function (roomId, accList) {
     try {
       for (let acc of accList) {
-        await GameRooms.update(
-          {
-            [acc]: sequelize.literal(`${acc} + 1`),
-          },
-          {
-            where: {
-              room_id: roomId,
+        if (acc === 'woodAccumulated') {
+          await GameRooms.update(
+            {
+              [acc]: sequelize.literal(`${acc} + 3`),
             },
-          }
-        );
+            {
+              where: {
+                room_id: roomId,
+              },
+            }
+          );
+        } else {
+          await GameRooms.update(
+            {
+              [acc]: sequelize.literal(`${acc} + 1`),
+            },
+            {
+              where: {
+                room_id: roomId,
+              },
+            }
+          );
+        }
       }
 
       let result = await GameRooms.findOne({
