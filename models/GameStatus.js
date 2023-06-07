@@ -55,14 +55,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
-      remainedFence: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
-      remainedChild: {
-        type: DataTypes.INTEGER,
-        defaultValue: 0,
-      },
       remainedFamily: {
         type: DataTypes.INTEGER,
         defaultValue: 3,
