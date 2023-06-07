@@ -531,6 +531,7 @@ module.exports = {
           ],
           usedSubFacilityCard: [],
           field: [],
+          food: 2,
         });
       } catch (err) {
         console.log(err);
@@ -1075,6 +1076,7 @@ module.exports = {
               cow: 0,
               wood: 3,
               fence: 3,
+              cage: 1,
               cageArea: 8,
               sand: 0,
               reed: 5,
@@ -1134,6 +1136,7 @@ module.exports = {
               cow: 0,
               wood: 2,
               fence: 7,
+              cage: 1,
               cageArea: 3,
               sand: 2,
               reed: 2,
@@ -1147,7 +1150,7 @@ module.exports = {
               stoneHouse: 0,
               field: [
                 {
-                  id: 1,
+                  id: 15,
                   kind: '',
                   remainedNum: 0,
                 },
@@ -1186,10 +1189,160 @@ module.exports = {
         return errResponse(baseResponse.DB_ERROR);
       }
       return response(baseResponse.SUCCESS);
-    }
-    // Bae should do this ☹️
-    else if (roundNum == 14) {
-      console.log('round 14');
+    } else if (roundNum == 14) {
+      try {
+        await GameRooms.update(
+          {
+            remainedMainFacilityCard: [
+              'Brazier2',
+              'Stove2',
+              'Well',
+              'Furniture factory',
+              'Bowl factory',
+              'Basket factory',
+            ],
+          },
+          {
+            where: {
+              room_id: roomId,
+            },
+          }
+        );
+        if (i == 0) {
+          await GameStatus.update(
+            {
+              isMyTurn: false,
+              order: 2,
+              nextOrder: 2,
+              sheep: 8,
+              pig: 4,
+              cow: 0,
+              wood: 4,
+              fence: 1,
+              cage: 2,
+              cageArea: 8,
+              sand: 2,
+              reed: 1,
+              stone: 0,
+              grainOnStorage: 1,
+              vegeOnStorage: 1,
+              family: 3,
+              baby: 0,
+              woodHouse: 4,
+              sandHouse: 0,
+              stoneHouse: 0,
+              field: [
+                {
+                  id: 1,
+                  kind: 'grain',
+                  remainedNum: 2,
+                },
+                {
+                  id: 2,
+                  kind: 'vege',
+                  remainedNum: 1,
+                },
+                {
+                  id: 3,
+                  kind: '',
+                  remainedNum: 0,
+                },
+              ],
+              food: 0,
+              remainedJobCard: [
+                'Walled workman',
+                'Roof mower',
+                'Adoptive parents',
+                'Woodcutter',
+                'Merchandiser',
+                'Organic farmer',
+              ],
+              usedJobCard: ['Small farmer'],
+              usedMainFacilityCard: ['Earthen kiln', 'Brazier1'],
+              remainedSubFacilityCard: [
+                'Carpenter room',
+                'Corn shovel',
+                'Threshing plate',
+                'Clay mine',
+                'Street vendor',
+                'Log boat',
+              ],
+              usedSubFacilityCard: ['Hard ceramic'],
+              numOfBeggingToken: 0,
+            },
+            {
+              where: {
+                userId,
+                roomId,
+              },
+            }
+          );
+        } else {
+          await GameStatus.update(
+            {
+              isMyTurn: true,
+              order: 1,
+              nextOrder: 1,
+              sheep: 3,
+              pig: 0,
+              cow: 4,
+              wood: 0,
+              fence: 0,
+              cage: 2,
+              cageArea: 9,
+              sand: 2,
+              reed: 1,
+              stone: 2,
+              grainOnStorage: 1,
+              vegeOnStorage: 1,
+              family: 3,
+              baby: 0,
+              woodHouse: 0,
+              sandHouse: 0,
+              stoneHouse: 2,
+              field: [
+                {
+                  id: 14,
+                  kind: '',
+                  remainedNum: 0,
+                },
+                {
+                  id: 15,
+                  kind: '',
+                  remainedNum: 0,
+                },
+              ],
+              food: 1,
+              remainedJobCard: [
+                'Subsidiary farmer',
+                'Hedge keeper',
+                'Servant',
+                'Plowman',
+              ],
+              usedJobCard: ['Counselor', 'Property manager', 'Palanquinist'],
+              usedMainFacilityCard: ['Stove1'],
+              remainedSubFacilityCard: [
+                'Manger',
+                'Kitchen room',
+                'Field of beans',
+                'Junkyard',
+                'Thick forest',
+              ],
+              usedSubFacilityCard: ['Crushed soil', 'Bottle'],
+              numOfBeggingToken: 1,
+            },
+            {
+              where: {
+                userId,
+                roomId,
+              },
+            }
+          );
+        }
+      } catch (err) {
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR);
+      }
       return response(baseResponse.SUCCESS);
     } else {
       return errResponse(baseResponse.BAD_REQUEST);
