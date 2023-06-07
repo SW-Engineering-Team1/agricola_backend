@@ -1193,4 +1193,31 @@ module.exports = {
       return errResponse(baseResponse.BAD_REQUEST);
     }
   },
+  accumulateGoods: async function (roomId, accList) {
+    try {
+      for (let acc of accList) {
+        await GameRooms.update(
+          {
+            [acc]: sequelize.literal(`${acc} + 1`),
+          },
+          {
+            where: {
+              room_id: roomId,
+            },
+          }
+        );
+      }
+
+      let result = await GameRooms.findOne({
+        where: {
+          room_id: roomId,
+        },
+        attributes: accList,
+      });
+      return response(baseResponse.SUCCESS, result);
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
 };

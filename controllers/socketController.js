@@ -21,6 +21,7 @@ module.exports = function (io) {
 
     socket.on('endGame', endGame);
     socket.on('skipGame', skipGame);
+    socket.on('accumulateGoods', accumulateGoods);
 
     async function useFacility(data) {
       let userId = data.userId;
@@ -822,6 +823,13 @@ module.exports = function (io) {
           io.sockets.emit('skipGame', errResponse(baseResponse.SERVER_ERROR));
         }
       }
+    }
+
+    async function accumulateGoods(data) {
+      let roomId = data.roomId;
+      let accList = data.accList;
+      let updateResult = await gameService.accumulateGoods(roomId, accList);
+      io.sockets.emit('accumulateGoods', updateResult);
     }
   });
 };
