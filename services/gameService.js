@@ -1148,7 +1148,7 @@ module.exports = {
               stoneHouse: 0,
               field: [
                 {
-                  id: 1,
+                  id: 15,
                   kind: '',
                   remainedNum: 0,
                 },
