@@ -760,9 +760,6 @@ module.exports = function (io) {
           io.sockets.emit('startRound', baseResponse.BAD_REQUEST);
           return;
         }
-        // 소규모 농부 사용되었다면
-        if (usedJobCardResult) {
-        }
 
         updateResult.push(await gameService.getPlayerStatus(userId, roomId));
       }
