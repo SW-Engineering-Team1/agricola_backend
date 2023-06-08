@@ -38,9 +38,11 @@ module.exports = {
           }
         );
       }
-      const updateResults = await GameStatus.findOne({
+
+      let updateResults = await GameStatus.findOne({
         where: { userId: userId },
       });
+      updateResults = updateResults.dataValues;
 
       const isValid = this.checkGoodsValidity(goodsList, updateResults);
       if (!isValid) {
@@ -59,6 +61,17 @@ module.exports = {
         }
         return errResponse(baseResponse.INVALID_GOODS_QUANTITY);
       }
+
+      let findGameRoomResult = await GameRooms.findOne({
+        where: {
+          room_id: roomId,
+        },
+        attributes: ['remainedMainFacilityCard'],
+      });
+      let remainedMainFacilityCard =
+        findGameRoomResult.dataValues.remainedMainFacilityCard;
+      updateResults['remainedMainFacilityCard'] = remainedMainFacilityCard;
+
       return updateResults;
     } catch (err) {
       console.log(err);
