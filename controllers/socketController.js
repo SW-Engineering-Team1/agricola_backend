@@ -67,7 +67,7 @@ module.exports = function (io) {
           ];
         }
         let updatedPlayer = await gameService.updateGoods(userId, dataList);
-        io.to(roomId).emit('useFacility', updatedPlayer);
+        io.sockets.emit('useFacility', updatedPlayer);
       } else if (data.actionName == 'Hard ceramics') {
         if (data.goods[0].num == 2) {
           dataList = [
@@ -241,7 +241,7 @@ module.exports = function (io) {
           data.roomId,
           data.goods
         );
-        io.to(data.roomId).emit('useActionSpace', updateResult);
+        io.sockets.emit('useActionSpace', updateResult);
       }
       // 빵 굽기 이벤트
       else if (data.actionName === 'Bake Bread') {
@@ -543,7 +543,7 @@ module.exports = function (io) {
           data.roomId,
           data.goods[0]
         );
-        io.to(data.roomId).emit('useActionSpace', updateResult);
+        io.sockets.emit('useActionSpace', updateResult);
       }
       // 누적칸 사용하기
       else if (data.actionName === 'Use Accumulated Goods') {
