@@ -44,7 +44,7 @@ module.exports = (sequelize, DataTypes) => {
       cardScore: 0,
     },
     {
-      cardName: 'Brazier',
+      cardName: 'Brazier1',
       cardKind: 'MainFacility',
       // TODO: 화덕의 경우 cost가 흙 4/5개 또는 화로 반납.. 우선 흙 4개로 설정
       cardCost: [
@@ -57,7 +57,7 @@ module.exports = (sequelize, DataTypes) => {
       cardScore: 0,
     },
     {
-      cardName: 'Stove',
+      cardName: 'Stove1',
       cardKind: 'MainFacility',
       // TODO: 화로의 경우... cost가 흙 2/3개 또는 화로 반납.. 우선 흙 2개로 설정
       cardCost: [
