@@ -267,7 +267,19 @@ module.exports = {
           roomId,
         },
       });
-      return playerDetail.dataValues;
+      playerDetail = playerDetail.dataValues;
+
+      let findGameRoomResult = await GameRooms.findOne({
+        where: {
+          room_id: roomId,
+        },
+        attributes: ['remainedMainFacilityCard'],
+      });
+      let remainedMainFacilityCard =
+        findGameRoomResult.dataValues.remainedMainFacilityCard;
+      playerDetail['remainedMainFacilityCard'] = remainedMainFacilityCard;
+
+      return playerDetail;
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
