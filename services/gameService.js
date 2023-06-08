@@ -1143,7 +1143,7 @@ module.exports = {
               sheep: 0,
               pig: 0,
               cow: 0,
-              wood: 2,
+              wood: 1,
               fence: 7,
               cage: 1,
               cageArea: 3,
