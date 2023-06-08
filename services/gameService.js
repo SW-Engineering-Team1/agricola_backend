@@ -20,7 +20,7 @@ module.exports = {
     }
     return true;
   },
-  updateGoods: async function (userId, goodsList) {
+  updateGoods: async function (userId, roomId, goodsList) {
     try {
       for (const goods of goodsList) {
         let { name, num, isAdd } = goods;
@@ -38,9 +38,11 @@ module.exports = {
           }
         );
       }
-      const updateResults = await GameStatus.findOne({
+
+      let updateResults = await GameStatus.findOne({
         where: { userId: userId },
       });
+      updateResults = updateResults.dataValues;
 
       const isValid = this.checkGoodsValidity(goodsList, updateResults);
       if (!isValid) {
@@ -59,6 +61,17 @@ module.exports = {
         }
         return errResponse(baseResponse.INVALID_GOODS_QUANTITY);
       }
+
+      let findGameRoomResult = await GameRooms.findOne({
+        where: {
+          room_id: roomId,
+        },
+        attributes: ['remainedMainFacilityCard'],
+      });
+      let remainedMainFacilityCard =
+        findGameRoomResult.dataValues.remainedMainFacilityCard;
+      updateResults['remainedMainFacilityCard'] = remainedMainFacilityCard;
+
       return updateResults;
     } catch (err) {
       console.log(err);
@@ -254,7 +267,19 @@ module.exports = {
           roomId,
         },
       });
-      return playerDetail.dataValues;
+      playerDetail = playerDetail.dataValues;
+
+      let findGameRoomResult = await GameRooms.findOne({
+        where: {
+          room_id: roomId,
+        },
+        attributes: ['remainedMainFacilityCard'],
+      });
+      let remainedMainFacilityCard =
+        findGameRoomResult.dataValues.remainedMainFacilityCard;
+      playerDetail['remainedMainFacilityCard'] = remainedMainFacilityCard;
+
+      return playerDetail;
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
