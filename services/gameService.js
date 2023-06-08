@@ -169,7 +169,7 @@ module.exports = {
         let findCardResult = await this.findCard(goodsName);
         let cardCost = findCardResult.cardCost;
 
-        if ((goodsName = 'Bottle')) {
+        if (goodsName == 'Bottle') {
           let familyNum =
             gameStatus.dataValues.family + gameStatus.dataValues.baby;
           cardCost = [
