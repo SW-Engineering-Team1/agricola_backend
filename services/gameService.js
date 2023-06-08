@@ -1058,6 +1058,15 @@ module.exports = {
               'Bowl factory',
               'Basket factory',
             ],
+            woodAccumulated: 5,
+            sandAccumulated: 4,
+            reedAccumulated: 0,
+            foodAccumulated: 0,
+            sheepAccumulated: 0,
+            stoneAccumulatedWest: 2,
+            pigAccumulated: 0,
+            cowAccumulated: 0,
+            stoneAccumulatedEast: 0,
           },
           {
             where: {
@@ -1201,6 +1210,15 @@ module.exports = {
               'Bowl factory',
               'Basket factory',
             ],
+            woodAccumulated: 5,
+            sandAccumulated: 3,
+            reedAccumulated: 6,
+            foodAccumulated: 1,
+            sheepAccumulated: 4,
+            stoneAccumulatedWest: 4,
+            pigAccumulated: 0,
+            cowAccumulated: 0,
+            stoneAccumulatedEast: 3,
           },
           {
             where: {
