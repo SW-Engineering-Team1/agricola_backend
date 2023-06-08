@@ -66,7 +66,11 @@ module.exports = function (io) {
             },
           ];
         }
-        let updatedPlayer = await gameService.updateGoods(userId, dataList);
+        let updatedPlayer = await gameService.updateGoods(
+          userId,
+          roomId,
+          dataList
+        );
         io.sockets.emit('useFacility', updatedPlayer);
       } else if (data.actionName == 'Hard ceramics') {
         if (data.goods[0].num == 2) {
@@ -97,7 +101,11 @@ module.exports = function (io) {
             },
           ];
         }
-        let updatedPlayer = await gameService.updateGoods(userId, dataList);
+        let updatedPlayer = await gameService.updateGoods(
+          userId,
+          roomId,
+          dataList
+        );
         io.sockets.emit('useFacility', updatedPlayer);
       } else if (data.actionName == 'Brazier') {
         if (data.goods[0].name === 'sheep') {
@@ -139,7 +147,11 @@ module.exports = function (io) {
           ];
         }
         console.log(dataList);
-        let updatedPlayer = await gameService.updateGoods(userId, dataList);
+        let updatedPlayer = await gameService.updateGoods(
+          userId,
+          roomId,
+          dataList
+        );
         io.sockets.emit('useFacility', updatedPlayer);
       }
     }
@@ -358,6 +370,7 @@ module.exports = function (io) {
 
           let updateResult = await gameService.updateGoods(
             data.userId,
+            data.roomId,
             goodsList
           );
           if (data.goods.length > 1) {
@@ -455,6 +468,7 @@ module.exports = function (io) {
           goodsList.push(tmp[0]);
           let updateResult = await gameService.updateGoods(
             data.userId,
+            data.roomId,
             goodsList
           );
           io.sockets.emit('useActionSpace', updateResult);
@@ -505,7 +519,11 @@ module.exports = function (io) {
           data.goods.splice(0, 3);
           data.goods[2].name = 'field';
           data.goods[2].isAdd = true;
-          updateResult = await gameService.updateGoods(data.userId, data.goods);
+          updateResult = await gameService.updateGoods(
+            data.userId,
+            data.roomId,
+            data.goods
+          );
           io.sockets.emit('useActionSpace', updateResult);
         }
       } else if (data.actionName === 'Fencing') {
@@ -517,6 +535,7 @@ module.exports = function (io) {
           if (data.goods[0].name === 'wood' || data.goods[0].name === 'stone') {
             let updateResult = await gameService.updateGoods(
               data.userId,
+              data.roomId,
               data.goods
             );
             io.sockets.emit('useActionSpace', updateResult);
@@ -529,6 +548,7 @@ module.exports = function (io) {
           if (data.goods[0].name === 'wood') {
             let updateResult = await gameService.updateGoods(
               data.userId,
+              data.roomId,
               data.goods
             );
             io.sockets.emit('useActionSpace', updateResult);
@@ -573,6 +593,7 @@ module.exports = function (io) {
 
         let updateResult = await gameService.updateGoods(
           data.userId,
+          data.roomId,
           data.goods
         );
 
@@ -584,6 +605,7 @@ module.exports = function (io) {
       } else {
         let updateResult = await gameService.updateGoods(
           data.userId,
+          data.roomId,
           data.goods
         );
         io.sockets.emit('useActionSpace', updateResult);
