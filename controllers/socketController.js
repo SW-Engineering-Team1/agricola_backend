@@ -538,12 +538,20 @@ module.exports = function (io) {
           }
         }
       } else if (data.actionName === 'Add Field') {
-        let updateResult = await gameService.addField(
+        let addFieldResult = await gameService.addField(
           data.userId,
           data.roomId,
           data.goods[0]
         );
-        io.sockets.emit('useActionSpace', updateResult);
+        if (addFieldResult.isSuccess == false) {
+          io.sockets.emit('useActionSpace', baseResponse.BAD_REQUEST);
+        } else {
+          let updateResult = await gameService.getPlayerStatus(
+            data.userId,
+            data.roomId
+          );
+          io.sockets.emit('useActionSpace', updateResult);
+        }
       }
       // 누적칸 사용하기
       else if (data.actionName === 'Use Accumulated Goods') {
