@@ -15,6 +15,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         defaultValue: 0,
       },
+      cowshed: {
+        type: DataTypes.INTEGER,
+        defaultValue: 0,
+      },
       pig: {
         type: DataTypes.INTEGER,
         defaultValue: 0,
