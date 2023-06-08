@@ -69,7 +69,7 @@ module.exports = function (io) {
           console.log(updatedPlayer);
           assert.equal(updatedPlayer.isSuccess, true);
         });
-      } else if (data.actionName == 'Hard ceramics') {
+      } else if (data.actionName == 'Hard ceramics') {
         if (data.goods[0].num == 2) {
           dataList = [
             data.goods[0],
