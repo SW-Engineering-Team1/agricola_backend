@@ -107,7 +107,7 @@ module.exports = (sequelize, DataTypes) => {
       cardScore: 4,
     },
     {
-      cardName: 'Hard ceramics ',
+      cardName: 'Hard ceramics ',
       cardKind: 'SubFacility',
       cardCost: [
         {
