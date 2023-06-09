@@ -753,16 +753,17 @@ module.exports = function (io) {
     async function endCycleHarvestCrop(data) {
       try {
         let roomId = data.roomId;
-        let userId = data.userId;
-
+        let userIdList = await roomService.findUserListByRoomId(roomId);
         // 작물 수확
-        let result = await gameService.harvestCrop(userId, roomId);
+        let result = await gameService.harvestCrop(userIdList, roomId);
         if (result.isSuccess === false) {
           io.sockets.emit('endCycle', result);
           return;
         }
-        let getPlayerStatus = await gameService.getPlayerStatus(userId, roomId);
-        io.sockets.emit('endCycleHarvestCrop', getPlayerStatus);
+        io.sockets.emit(
+          'endCycleHarvestCrop',
+          response(baseResponse.SUCCESS, result)
+        );
       } catch (err) {
         console.log(err);
         io.sockets.emit(

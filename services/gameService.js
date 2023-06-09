@@ -431,38 +431,46 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
-  harvestCrop: async function (userId, roomId) {
-    let playerDetail = await GameStatus.findOne({
-      where: {
-        userId: userId,
-        roomId,
-      },
-    });
-
-    let data = [];
-    let field = [];
-    for (let element of playerDetail.dataValues.field) {
-      if (element.remainedNum != 0) {
-        data.push({ name: element.kind + 'OnStorage', num: 1, isAdd: true });
-        element.remainedNum -= 1;
-      }
-      field.push(element);
-    }
+  harvestCrop: async function (userIdList, roomId) {
     try {
-      await GameStatus.update(
-        {
-          field: field,
-        },
-        {
+      let result = [];
+      for (let userId of userIdList) {
+        let playerDetail = await GameStatus.findOne({
           where: {
             userId: userId,
             roomId,
           },
+        });
+
+        let data = [];
+        let field = [];
+        for (let element of playerDetail.dataValues.field) {
+          if (element.remainedNum != 0) {
+            data.push({
+              name: element.kind + 'OnStorage',
+              num: 1,
+              isAdd: true,
+            });
+            element.remainedNum -= 1;
+          }
+          field.push(element);
         }
-      );
-      console.log(data);
-      let result = await this.updateGoods(userId, roomId, data);
-      return response(baseResponse.SUCCESS, result);
+        await GameStatus.update(
+          {
+            field: field,
+          },
+          {
+            where: {
+              userId: userId,
+              roomId,
+            },
+          }
+        );
+        console.log(data);
+        let updateGoodResult = await this.updateGoods(userId, roomId, data);
+        result.push(updateGoodResult);
+      }
+      return { gameStatusList: result };
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
