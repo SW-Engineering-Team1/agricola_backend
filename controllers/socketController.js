@@ -12,7 +12,11 @@ module.exports = function (io) {
     socket.on('exitRoom', exitRoom);
     socket.on('startRound', startRound);
     socket.on('endRound', endRound);
-    socket.on('endCycle', endCycle);
+
+    socket.on('endCycleHarvestCrop', endCycleHarvestCrop);
+    socket.on('endCyclePayFood', endCyclePayFood);
+    socket.on('endCycleBreedAnimal', endCycleBreedAnimal);
+
     socket.on('startGame', startGame);
     socket.on('useFacility', useFacility);
 
@@ -746,7 +750,7 @@ module.exports = function (io) {
       }
     }
 
-    async function endCycle(data) {
+    async function endCycleHarvestCrop(data) {
       try {
         let roomId = data.roomId;
         let userId = data.userId;
@@ -757,31 +761,58 @@ module.exports = function (io) {
           io.sockets.emit('endCycle', result);
           return;
         }
-        // 음식 지불
-        else {
-          result = await gameService.payFood(userId, roomId);
-          if (result.isSuccess === false) {
-            io.sockets.emit('endCycle', result);
-            return;
-          }
-          // 가축 번식
-          else {
-            result = await gameService.breedAnimal(userId, roomId);
-            if (result.isSuccess === false) {
-              io.sockets.emit('endCycle', result);
-              return;
-            } else {
-              let getPlayerStatus = await gameService.getPlayerStatus(
-                userId,
-                roomId
-              );
-              io.sockets.emit('endCycle', getPlayerStatus);
-            }
-          }
-        }
+        let getPlayerStatus = await gameService.getPlayerStatus(userId, roomId);
+        io.sockets.emit('endCycleHarvestCrop', getPlayerStatus);
       } catch (err) {
         console.log(err);
-        io.sockets.emit('endCycle', errResponse(baseResponse.SERVER_ERROR));
+        io.sockets.emit(
+          'endCycleHarvestCrop',
+          errResponse(baseResponse.SERVER_ERROR)
+        );
+      }
+    }
+
+    async function endCyclePayFood(data) {
+      try {
+        let roomId = data.roomId;
+        let userId = data.userId;
+
+        //음식 지불
+        let result = await gameService.payFood(userId, roomId);
+        if (result.isSuccess === false) {
+          io.sockets.emit('endCycle', result);
+          return;
+        }
+        let getPlayerStatus = await gameService.getPlayerStatus(userId, roomId);
+        io.sockets.emit('endCyclePayFood', getPlayerStatus);
+      } catch (err) {
+        console.log(err);
+        io.sockets.emit(
+          'endCyclePayFood',
+          errResponse(baseResponse.SERVER_ERROR)
+        );
+      }
+    }
+
+    async function endCycleBreedAnimal(data) {
+      try {
+        let roomId = data.roomId;
+        let userId = data.userId;
+
+        //음식 지불
+        let result = await gameService.breedAnimal(userId, roomId);
+        if (result.isSuccess === false) {
+          io.sockets.emit('endCycle', result);
+          return;
+        }
+        let getPlayerStatus = await gameService.getPlayerStatus(userId, roomId);
+        io.sockets.emit('endCycleBreedAnimal', getPlayerStatus);
+      } catch (err) {
+        console.log(err);
+        io.sockets.emit(
+          'endCycleBreedAnimal',
+          errResponse(baseResponse.SERVER_ERROR)
+        );
       }
     }
 
