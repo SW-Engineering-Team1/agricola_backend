@@ -906,6 +906,7 @@ module.exports = function (io) {
       roomId = data.roomId;
       let i = 0;
       let skipResult = [];
+      let accumulateGoods = [];
       for (let obj of data.userId) {
         try {
           let userId = obj.userId;
@@ -924,6 +925,9 @@ module.exports = function (io) {
               roomId
             );
             skipResult.push(updatedPlayer);
+            accumulateGoods = await gameService.getAccumulatedGoodsByRoomId(
+              roomId
+            );
           }
         } catch (err) {
           console.log(err);
@@ -932,6 +936,7 @@ module.exports = function (io) {
       }
       io.sockets.emit('skipGame', {
         updatedPlayer: skipResult,
+        accResult: accumulateGoods,
         skipRound: data.skipRound,
       });
     }
