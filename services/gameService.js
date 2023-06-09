@@ -574,7 +574,7 @@ module.exports = {
           usedJobCard: [],
           usedMainFacilityCard: [],
           remainedSubFacilityCard: [
-            'Hard ceramic',
+            'Hard ceramics',
             'Carpenter room',
             'Corn shovel',
             'Threshing plate',
@@ -780,15 +780,15 @@ module.exports = {
       let score = 0;
 
       // 밭
-      if (data.field <= 1) {
+      if (data.field.length <= 1) {
         score -= 1;
-      } else if (data.field == 2) {
+      } else if (data.field.length == 2) {
         score += 1;
-      } else if (data.field == 3) {
+      } else if (data.field.length == 3) {
         score += 2;
-      } else if (data.field == 4) {
+      } else if (data.field.length == 4) {
         score += 3;
-      } else if (data.field >= 5) {
+      } else if (data.field.length >= 5) {
         score += 4;
       }
 
@@ -870,7 +870,7 @@ module.exports = {
       // 사용하지 않는 빈칸
       score -=
         15 -
-        (data.field +
+        (data.field.length +
           data.woodHouse +
           data.sandHouse +
           data.stoneHouse +
@@ -1169,7 +1169,7 @@ module.exports = {
               usedJobCard: ['Small farmer'],
               usedMainFacilityCard: ['Earthen kiln'],
               remainedSubFacilityCard: [
-                'Hard ceramic',
+                'Hard ceramics',
                 'Carpenter room',
                 'Corn shovel',
                 'Threshing plate',
@@ -1339,7 +1339,7 @@ module.exports = {
                 'Street vendor',
                 'Manger',
               ],
-              usedSubFacilityCard: ['Hard ceramic'],
+              usedSubFacilityCard: ['Hard ceramics'],
               numOfBeggingToken: 0,
             },
             {

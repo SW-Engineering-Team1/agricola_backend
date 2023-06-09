@@ -41,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
           isAdd: false,
         },
       ],
-      cardScore: 0,
+      cardScore: 2,
     },
     {
       cardName: 'Brazier1',
@@ -54,7 +54,7 @@ module.exports = (sequelize, DataTypes) => {
           isAdd: false,
         },
       ],
-      cardScore: 0,
+      cardScore: 1,
     },
     {
       cardName: 'Stove1',
@@ -67,7 +67,7 @@ module.exports = (sequelize, DataTypes) => {
           isAdd: false,
         },
       ],
-      cardScore: 0,
+      cardScore: 1,
     },
     {
       cardName: 'Crushed soil',
@@ -107,7 +107,7 @@ module.exports = (sequelize, DataTypes) => {
       cardScore: 4,
     },
     {
-      cardName: 'Hard ceramics ',
+      cardName: 'Hard ceramics',
       cardKind: 'SubFacility',
       cardCost: [
         {
@@ -116,6 +116,30 @@ module.exports = (sequelize, DataTypes) => {
           isAdd: false,
         },
       ],
+      cardScore: 0,
+    },
+    {
+      cardName: 'Small farmer',
+      cardKind: 'Job',
+      cardCost: [],
+      cardScore: 0,
+    },
+    {
+      cardName: 'Counselor',
+      cardKind: 'Job',
+      cardCost: [],
+      cardScore: 0,
+    },
+    {
+      cardName: 'Property manager',
+      cardKind: 'Job',
+      cardCost: [],
+      cardScore: 0,
+    },
+    {
+      cardName: 'Palanquinist',
+      cardKind: 'Job',
+      cardCost: [],
       cardScore: 0,
     },
   ];
