@@ -133,7 +133,11 @@ module.exports = {
         let findCardResult = await this.findCard(goodsName);
         let cardCost = findCardResult.cardCost;
 
-        let updateGoodsResult = await this.updateGoods(userId, cardCost);
+        let updateGoodsResult = await this.updateGoods(
+          userId,
+          roomId,
+          cardCost
+        );
         if (updateGoodsResult.isSuccess == false) {
           return false;
         }
@@ -191,7 +195,11 @@ module.exports = {
           ];
         }
 
-        let updateGoodsResult = await this.updateGoods(userId, cardCost);
+        let updateGoodsResult = await this.updateGoods(
+          userId,
+          roomId,
+          cardCost
+        );
         if (updateGoodsResult.isSuccess == false) {
           return false;
         }
@@ -409,11 +417,11 @@ module.exports = {
           num: 1,
           isAdd: true,
         });
-        await this.updateGoods(userId, cardCost.dataValues.cardCost);
+        await this.updateGoods(userId, roomId, cardCost.dataValues.cardCost);
         if (jobCardName === 'Counselor') {
           let tmp = [];
           tmp[0] = JSON.parse(`{"name": "sand", "num": 3, "isAdd": true}`);
-          await this.updateGoods(userId, tmp);
+          await this.updateGoods(userId, roomId, tmp);
         } else if (jobCardName === '') {
         }
       }
@@ -452,7 +460,8 @@ module.exports = {
           },
         }
       );
-      let result = await this.updateGoods(userId, data);
+      console.log(data);
+      let result = await this.updateGoods(userId, roomId, data);
       return response(baseResponse.SUCCESS, result);
     } catch (err) {
       console.log(err);
@@ -478,7 +487,7 @@ module.exports = {
         isAdd: false,
       });
       try {
-        let result = await this.updateGoods(userId, data);
+        let result = await this.updateGoods(userId, roomId, data);
         return response(baseResponse.SUCCESS, result);
       } catch (err) {
         console.log(err);
@@ -488,7 +497,7 @@ module.exports = {
       let data = [];
       data.push({ name: 'food', num: pay, isAdd: false });
       try {
-        let result = await this.updateGoods(userId, data);
+        let result = await this.updateGoods(userId, roomId, data);
         return response(baseResponse.SUCCESS, result);
       } catch (err) {
         console.log(err);
@@ -516,7 +525,7 @@ module.exports = {
 
     // console.log(data)
     try {
-      let result = await this.updateGoods(userId, data);
+      let result = await this.updateGoods(userId, roomId, data);
       return response(baseResponse.SUCCESS, result);
     } catch (err) {
       console.log(err);
@@ -730,7 +739,7 @@ module.exports = {
             isAdd: true,
           },
         ];
-        await this.updateGoods(userId, updateData);
+        await this.updateGoods(userId, roomId, updateData);
         return true;
       } else {
         return false;

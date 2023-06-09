@@ -814,6 +814,7 @@ module.exports = function (io) {
       for (let userId of findUserList) {
         usedJobCardResult = await gameService.usedJobCard(
           userId,
+          roomId,
           'Small farmer'
         );
         if (usedJobCardResult.isSuccess == false) {
