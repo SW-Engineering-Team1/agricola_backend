@@ -1498,4 +1498,29 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
+  getAccumulatedGoodsByRoomId: async (roomId) => {
+    try {
+      let accList = [
+        'woodAccumulated',
+        'sandAccumulated',
+        'reedAccumulated',
+        'foodAccumulated',
+        'sheepAccumulated',
+        'stoneAccumulatedWest',
+        'pigAccumulated',
+        'cowAccumulated',
+        'stoneAccumulatedEast',
+      ];
+      let result = await GameRooms.findOne({
+        where: {
+          room_id: roomId,
+        },
+        attributes: accList,
+      });
+      return result;
+    } catch (err) {
+      console.log(err);
+      return errResponse(baseResponse.DB_ERROR);
+    }
+  },
 };
