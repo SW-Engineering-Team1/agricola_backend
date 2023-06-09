@@ -119,7 +119,7 @@ module.exports = {
           `{"name": "sandHouse", "num": "${playerHouse}", "isAdd": false}`
         );
       } else {
-        io.to(roomId).emit('useActionSpace', baseResponse.BAD_REQUEST);
+        io.sockets.emit('useActionSpace', baseResponse.BAD_REQUEST);
       }
 
       if (
@@ -127,7 +127,7 @@ module.exports = {
         goodsList[1].num != 1 ||
         goodsList[2].num != goodsList[0].num
       ) {
-        io.to(roomId).emit('useActionSpace', baseResponse.NOT_ENOUGHDATA);
+        io.sockets.emit('useActionSpace', baseResponse.NOT_ENOUGHDATA);
         console.log('error');
         return;
       }
