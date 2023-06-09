@@ -432,9 +432,9 @@ module.exports = {
     }
   },
   harvestCrop: async function (userIdList, roomId) {
-    try {
-      let result = [];
-      for (let userId of userIdList) {
+    let result = [];
+    for (let userId of userIdList) {
+      try {
         let playerDetail = await GameStatus.findOne({
           where: {
             userId: userId,
@@ -469,12 +469,12 @@ module.exports = {
         console.log(data);
         let updateGoodResult = await this.updateGoods(userId, roomId, data);
         result.push(updateGoodResult);
+      } catch (err) {
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR);
       }
-      return { gameStatusList: result };
-    } catch (err) {
-      console.log(err);
-      return errResponse(baseResponse.DB_ERROR);
     }
+    return { gameStatusList: result };
   },
   payFood: async function (userIdList, roomId) {
     let result = [];
