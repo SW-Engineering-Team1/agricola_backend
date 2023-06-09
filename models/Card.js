@@ -41,7 +41,7 @@ module.exports = (sequelize, DataTypes) => {
           isAdd: false,
         },
       ],
-      cardScore: 0,
+      cardScore: 2,
     },
     {
       cardName: 'Brazier1',
@@ -54,7 +54,7 @@ module.exports = (sequelize, DataTypes) => {
           isAdd: false,
         },
       ],
-      cardScore: 0,
+      cardScore: 1,
     },
     {
       cardName: 'Stove1',
@@ -67,7 +67,7 @@ module.exports = (sequelize, DataTypes) => {
           isAdd: false,
         },
       ],
-      cardScore: 0,
+      cardScore: 1,
     },
     {
       cardName: 'Crushed soil',
