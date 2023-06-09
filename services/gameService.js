@@ -572,7 +572,7 @@ module.exports = {
           usedJobCard: [],
           usedMainFacilityCard: [],
           remainedSubFacilityCard: [
-            'Hard ceramic',
+            'Hard ceramics',
             'Carpenter room',
             'Corn shovel',
             'Threshing plate',
@@ -1167,7 +1167,7 @@ module.exports = {
               usedJobCard: ['Small farmer'],
               usedMainFacilityCard: ['Earthen kiln'],
               remainedSubFacilityCard: [
-                'Hard ceramic',
+                'Hard ceramics',
                 'Carpenter room',
                 'Corn shovel',
                 'Threshing plate',
@@ -1337,7 +1337,7 @@ module.exports = {
                 'Street vendor',
                 'Manger',
               ],
-              usedSubFacilityCard: ['Hard ceramic'],
+              usedSubFacilityCard: ['Hard ceramics'],
               numOfBeggingToken: 0,
             },
             {
