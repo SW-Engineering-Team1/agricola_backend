@@ -27,7 +27,7 @@ module.exports = function (io) {
       let userId = data.userId;
       let roomId = data.roomId;
       let dataList = [];
-      if (data.actionName === 'Stove') {
+      if (data.actionName === 'Stove1') {
         if (data.goods[0].name === 'sheep') {
           dataList = [
             data.goods[0],
@@ -107,7 +107,7 @@ module.exports = function (io) {
           dataList
         );
         io.sockets.emit('useFacility', updatedPlayer);
-      } else if (data.actionName == 'Brazier') {
+      } else if (data.actionName == 'Brazier1') {
         if (data.goods[0].name === 'sheep') {
           dataList = [
             data.goods[0],
@@ -146,7 +146,6 @@ module.exports = function (io) {
             },
           ];
         }
-        console.log(dataList);
         let updatedPlayer = await gameService.updateGoods(
           userId,
           roomId,
@@ -182,7 +181,7 @@ module.exports = function (io) {
       //     userId: 'test2',
       //   },
       // ];
-      data.forEach(async (roomData) => {
+      for (let roomData of data) {
         let roomId = roomData.roomId;
         let userId = roomData.userId;
         let isStart = await roomService.checkIsInGameStatus(roomId, userId);
@@ -191,10 +190,19 @@ module.exports = function (io) {
           return;
         } else {
           await gameService.startGame(roomId, userId);
-          let gameStatus = await roomService.getGameStatus(data[0].roomId);
-          io.sockets.emit('startGame', gameStatus);
         }
-      });
+      }
+      let gameStatus = await roomService.getGameStatus(data[0].roomId);
+      let mainFacilityList = await gameService.getMainFacilityCards(
+        data[0].roomId
+      );
+      io.sockets.emit(
+        'startGame',
+        response(baseResponse.SUCCESS, {
+          gameStatusList: gameStatus,
+          mainFacilityList: mainFacilityList,
+        })
+      );
 
       let updatedRooms = await roomService.getRooms();
       io.sockets.emit('updatedRooms', updatedRooms);
@@ -224,7 +232,9 @@ module.exports = function (io) {
           let updatedFacilityList = await gameService.getMainFacilityCards(
             data.roomId
           );
-          io.sockets.emit('useActionSpace', updatedFacilityList);
+          io.sockets.emit('useActionSpace', baseResponse.SUCCESS, {
+            updatedFacilityList,
+          });
 
           // 주요설비를 사용한 플레이어의 상태 emit 필요
           let updatedPlayer = await gameService.getPlayerStatus(

@@ -253,7 +253,7 @@ module.exports = {
           room_id: roomId,
         },
       });
-      return gameRoom.dataValues;
+      return gameRoom.dataValues.remainedMainFacilityCard;
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
@@ -277,9 +277,11 @@ module.exports = {
       });
       let remainedMainFacilityCard =
         findGameRoomResult.dataValues.remainedMainFacilityCard;
-      playerDetail['remainedMainFacilityCard'] = remainedMainFacilityCard;
 
-      return playerDetail;
+      return {
+        playerDetail: playerDetail,
+        remainedMainFacilityCard: remainedMainFacilityCard,
+      };
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
