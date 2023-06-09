@@ -16,7 +16,11 @@ module.exports = {
           roomId: roomId,
         },
       });
-      return response(baseResponse.SUCCESS, gameStatus);
+      let result = [];
+      for (let tmp of gameStatus) {
+        result.push(tmp.dataValues);
+      }
+      return result;
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);

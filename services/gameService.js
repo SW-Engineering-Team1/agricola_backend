@@ -253,7 +253,7 @@ module.exports = {
           room_id: roomId,
         },
       });
-      return gameRoom.dataValues;
+      return gameRoom.dataValues.remainedMainFacilityCard;
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
