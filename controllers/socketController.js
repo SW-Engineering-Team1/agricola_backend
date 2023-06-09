@@ -800,16 +800,18 @@ module.exports = function (io) {
     async function endCycleBreedAnimal(data) {
       try {
         let roomId = data.roomId;
-        let userId = data.userId;
+        let userIdList = await roomService.findUserListByRoomId(roomId);
 
         //음식 지불
-        let result = await gameService.breedAnimal(userId, roomId);
+        let result = await gameService.breedAnimal(userIdList, roomId);
         if (result.isSuccess === false) {
           io.sockets.emit('endCycle', result);
           return;
         }
-        let getPlayerStatus = await gameService.getPlayerStatus(userId, roomId);
-        io.sockets.emit('endCycleBreedAnimal', getPlayerStatus);
+        io.sockets.emit(
+          'endCycleBreedAnimal',
+          response(baseResponse.SUCCESS, result)
+        );
       } catch (err) {
         console.log(err);
         io.sockets.emit(

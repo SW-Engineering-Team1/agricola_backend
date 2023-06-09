@@ -519,31 +519,34 @@ module.exports = {
     }
     return { gameStatusList: result };
   },
-  breedAnimal: async function (userId, roomId) {
-    let playerDetail = await GameStatus.findOne({
-      where: {
-        userId: userId,
-        roomId,
-      },
-    });
-    let data = [];
-    if (playerDetail.dataValues.sheep > 1) {
-      data.push({ name: 'sheep', num: 1, isAdd: true });
-    }
-    if (playerDetail.dataValues.pig > 1) {
-      data.push({ name: 'pig', num: 1, isAdd: true });
-    }
-    if (playerDetail.dataValues.cow > 1) {
-      data.push({ name: 'cow', num: 1, isAdd: true });
-    }
+  breedAnimal: async function (userIdList, roomId) {
+    let result = [];
+    for (userId of userIdList) {
+      let playerDetail = await GameStatus.findOne({
+        where: {
+          userId: userId,
+          roomId,
+        },
+      });
+      let data = [];
+      if (playerDetail.dataValues.sheep > 1) {
+        data.push({ name: 'sheep', num: 1, isAdd: true });
+      }
+      if (playerDetail.dataValues.pig > 1) {
+        data.push({ name: 'pig', num: 1, isAdd: true });
+      }
+      if (playerDetail.dataValues.cow > 1) {
+        data.push({ name: 'cow', num: 1, isAdd: true });
+      }
 
-    // console.log(data)
-    try {
-      let result = await this.updateGoods(userId, roomId, data);
-      return response(baseResponse.SUCCESS, result);
-    } catch (err) {
-      console.log(err);
-      return errResponse(baseResponse.DB_ERROR);
+      try {
+        let updateGoodsResult = await this.updateGoods(userId, roomId, data);
+        result.push(updateGoodsResult);
+      } catch (err) {
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR);
+      }
+      return { gameStatusList: result };
     }
   },
   startGame: async function (roomId, userId) {
