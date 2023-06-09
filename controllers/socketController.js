@@ -776,16 +776,18 @@ module.exports = function (io) {
     async function endCyclePayFood(data) {
       try {
         let roomId = data.roomId;
-        let userId = data.userId;
-
+        let userIdList = await roomService.findUserListByRoomId(roomId);
+        console.log(userIdList);
         //음식 지불
-        let result = await gameService.payFood(userId, roomId);
+        let result = await gameService.payFood(userIdList, roomId);
         if (result.isSuccess === false) {
           io.sockets.emit('endCycle', result);
           return;
         }
-        let getPlayerStatus = await gameService.getPlayerStatus(userId, roomId);
-        io.sockets.emit('endCyclePayFood', getPlayerStatus);
+        io.sockets.emit(
+          'endCyclePayFood',
+          response(baseResponse.SUCCESS, result)
+        );
       } catch (err) {
         console.log(err);
         io.sockets.emit(

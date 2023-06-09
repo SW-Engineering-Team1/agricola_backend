@@ -476,42 +476,48 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
-  payFood: async function (userId, roomId) {
-    let playerDetail = await GameStatus.findOne({
-      where: {
-        userId: userId,
-        roomId,
-      },
-    });
-    let pay =
-      playerDetail.dataValues.family * 2 + playerDetail.dataValues.baby * 1;
-    if (pay > playerDetail.dataValues.food) {
-      let begging = pay - playerDetail.dataValues.food;
-      let data = [];
-      data.push({ name: 'numOfBeggingToken', num: begging, isAdd: true });
-      data.push({
-        name: 'food',
-        num: playerDetail.dataValues.food,
-        isAdd: false,
+  payFood: async function (userIdList, roomId) {
+    let result = [];
+    for (userId of userIdList) {
+      let playerDetail = await GameStatus.findOne({
+        where: {
+          userId: userId,
+          roomId,
+        },
       });
-      try {
-        let result = await this.updateGoods(userId, roomId, data);
-        return response(baseResponse.SUCCESS, result);
-      } catch (err) {
-        console.log(err);
-        return errResponse(baseResponse.DB_ERROR);
-      }
-    } else {
-      let data = [];
-      data.push({ name: 'food', num: pay, isAdd: false });
-      try {
-        let result = await this.updateGoods(userId, roomId, data);
-        return response(baseResponse.SUCCESS, result);
-      } catch (err) {
-        console.log(err);
-        return errResponse(baseResponse.DB_ERROR);
+      let pay =
+        playerDetail.dataValues.family * 2 + playerDetail.dataValues.baby * 1;
+      if (pay > playerDetail.dataValues.food) {
+        let begging = pay - playerDetail.dataValues.food;
+        let data = [];
+        data.push({ name: 'numOfBeggingToken', num: begging, isAdd: true });
+        data.push({
+          name: 'food',
+          num: playerDetail.dataValues.food,
+          isAdd: false,
+        });
+        try {
+          let updateGoodResult = await this.updateGoods(userId, roomId, data);
+          result.push(updateGoodResult);
+          // return response(baseResponse.SUCCESS, updateGoodResult);
+        } catch (err) {
+          console.log(err);
+          return errResponse(baseResponse.DB_ERROR);
+        }
+      } else {
+        let data = [];
+        data.push({ name: 'food', num: pay, isAdd: false });
+        try {
+          let updateGoodResult = await this.updateGoods(userId, roomId, data);
+          result.push(updateGoodResult);
+          // return response(baseResponse.SUCCESS, updateGoodResult);
+        } catch (err) {
+          console.log(err);
+          return errResponse(baseResponse.DB_ERROR);
+        }
       }
     }
+    return { gameStatusList: result };
   },
   breedAnimal: async function (userId, roomId) {
     let playerDetail = await GameStatus.findOne({
