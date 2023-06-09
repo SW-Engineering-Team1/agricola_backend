@@ -133,7 +133,11 @@ module.exports = {
         let findCardResult = await this.findCard(goodsName);
         let cardCost = findCardResult.cardCost;
 
-        let updateGoodsResult = await this.updateGoods(userId, cardCost);
+        let updateGoodsResult = await this.updateGoods(
+          userId,
+          roomId,
+          cardCost
+        );
         if (updateGoodsResult.isSuccess == false) {
           return false;
         }
@@ -191,7 +195,11 @@ module.exports = {
           ];
         }
 
-        let updateGoodsResult = await this.updateGoods(userId, cardCost);
+        let updateGoodsResult = await this.updateGoods(
+          userId,
+          roomId,
+          cardCost
+        );
         if (updateGoodsResult.isSuccess == false) {
           return false;
         }
@@ -411,11 +419,11 @@ module.exports = {
           num: 1,
           isAdd: true,
         });
-        await this.updateGoods(userId, cardCost.dataValues.cardCost);
+        await this.updateGoods(userId, roomId, cardCost.dataValues.cardCost);
         if (jobCardName === 'Counselor') {
           let tmp = [];
           tmp[0] = JSON.parse(`{"name": "sand", "num": 3, "isAdd": true}`);
-          await this.updateGoods(userId, tmp);
+          await this.updateGoods(userId, roomId, tmp);
         } else if (jobCardName === '') {
         }
       }
@@ -425,104 +433,122 @@ module.exports = {
       return errResponse(baseResponse.DB_ERROR);
     }
   },
-  harvestCrop: async function (userId, roomId) {
-    let playerDetail = await GameStatus.findOne({
-      where: {
-        userId: userId,
-        roomId,
-      },
-    });
-
-    let data = [];
-    let field = [];
-    for (let element of playerDetail.dataValues.field) {
-      if (element.remainedNum != 0) {
-        data.push({ name: element.kind + 'OnStorage', num: 1, isAdd: true });
-        element.remainedNum -= 1;
-      }
-      field.push(element);
-    }
-    try {
-      await GameStatus.update(
-        {
-          field: field,
-        },
-        {
+  harvestCrop: async function (userIdList, roomId) {
+    let result = [];
+    for (let userId of userIdList) {
+      try {
+        let playerDetail = await GameStatus.findOne({
           where: {
             userId: userId,
             roomId,
           },
-        }
-      );
-      let result = await this.updateGoods(userId, data);
-      return response(baseResponse.SUCCESS, result);
-    } catch (err) {
-      console.log(err);
-      return errResponse(baseResponse.DB_ERROR);
-    }
-  },
-  payFood: async function (userId, roomId) {
-    let playerDetail = await GameStatus.findOne({
-      where: {
-        userId: userId,
-        roomId,
-      },
-    });
-    let pay =
-      playerDetail.dataValues.family * 2 + playerDetail.dataValues.baby * 1;
-    if (pay > playerDetail.dataValues.food) {
-      let begging = pay - playerDetail.dataValues.food;
-      let data = [];
-      data.push({ name: 'numOfBeggingToken', num: begging, isAdd: true });
-      data.push({
-        name: 'food',
-        num: playerDetail.dataValues.food,
-        isAdd: false,
-      });
-      try {
-        let result = await this.updateGoods(userId, data);
-        return response(baseResponse.SUCCESS, result);
-      } catch (err) {
-        console.log(err);
-        return errResponse(baseResponse.DB_ERROR);
-      }
-    } else {
-      let data = [];
-      data.push({ name: 'food', num: pay, isAdd: false });
-      try {
-        let result = await this.updateGoods(userId, data);
-        return response(baseResponse.SUCCESS, result);
-      } catch (err) {
-        console.log(err);
-        return errResponse(baseResponse.DB_ERROR);
-      }
-    }
-  },
-  breedAnimal: async function (userId, roomId) {
-    let playerDetail = await GameStatus.findOne({
-      where: {
-        userId: userId,
-        roomId,
-      },
-    });
-    let data = [];
-    if (playerDetail.dataValues.sheep > 1) {
-      data.push({ name: 'sheep', num: 1, isAdd: true });
-    }
-    if (playerDetail.dataValues.pig > 1) {
-      data.push({ name: 'pig', num: 1, isAdd: true });
-    }
-    if (playerDetail.dataValues.cow > 1) {
-      data.push({ name: 'cow', num: 1, isAdd: true });
-    }
+        });
 
-    // console.log(data)
-    try {
-      let result = await this.updateGoods(userId, data);
-      return response(baseResponse.SUCCESS, result);
-    } catch (err) {
-      console.log(err);
-      return errResponse(baseResponse.DB_ERROR);
+        let data = [];
+        let field = [];
+        for (let element of playerDetail.dataValues.field) {
+          if (element.remainedNum != 0) {
+            data.push({
+              name: element.kind + 'OnStorage',
+              num: 1,
+              isAdd: true,
+            });
+            element.remainedNum -= 1;
+          }
+          field.push(element);
+        }
+        await GameStatus.update(
+          {
+            field: field,
+          },
+          {
+            where: {
+              userId: userId,
+              roomId,
+            },
+          }
+        );
+        console.log(data);
+        let updateGoodResult = await this.updateGoods(userId, roomId, data);
+        result.push(updateGoodResult);
+      } catch (err) {
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR);
+      }
+    }
+    return { gameStatusList: result };
+  },
+  payFood: async function (userIdList, roomId) {
+    let result = [];
+    for (userId of userIdList) {
+      let playerDetail = await GameStatus.findOne({
+        where: {
+          userId: userId,
+          roomId,
+        },
+      });
+      let pay =
+        playerDetail.dataValues.family * 2 + playerDetail.dataValues.baby * 1;
+      if (pay > playerDetail.dataValues.food) {
+        let begging = pay - playerDetail.dataValues.food;
+        let data = [];
+        data.push({ name: 'numOfBeggingToken', num: begging, isAdd: true });
+        data.push({
+          name: 'food',
+          num: playerDetail.dataValues.food,
+          isAdd: false,
+        });
+        try {
+          let updateGoodResult = await this.updateGoods(userId, roomId, data);
+          result.push(updateGoodResult);
+          // return response(baseResponse.SUCCESS, updateGoodResult);
+        } catch (err) {
+          console.log(err);
+          return errResponse(baseResponse.DB_ERROR);
+        }
+      } else {
+        let data = [];
+        data.push({ name: 'food', num: pay, isAdd: false });
+        try {
+          let updateGoodResult = await this.updateGoods(userId, roomId, data);
+          result.push(updateGoodResult);
+          // return response(baseResponse.SUCCESS, updateGoodResult);
+        } catch (err) {
+          console.log(err);
+          return errResponse(baseResponse.DB_ERROR);
+        }
+      }
+    }
+    return { gameStatusList: result };
+  },
+  breedAnimal: async function (userIdList, roomId) {
+    let result = [];
+    for (userId of userIdList) {
+      let playerDetail = await GameStatus.findOne({
+        where: {
+          userId: userId,
+          roomId,
+        },
+      });
+      let data = [];
+      if (playerDetail.dataValues.sheep > 1) {
+        data.push({ name: 'sheep', num: 1, isAdd: true });
+      }
+      if (playerDetail.dataValues.pig > 1) {
+        data.push({ name: 'pig', num: 1, isAdd: true });
+      }
+      if (playerDetail.dataValues.cow > 1) {
+        data.push({ name: 'cow', num: 1, isAdd: true });
+      }
+
+      try {
+        let updateGoodsResult = await this.updateGoods(userId, roomId, data);
+        result.push(updateGoodsResult);
+      } catch (err) {
+        console.log(err);
+        return errResponse(baseResponse.DB_ERROR);
+      }
+      return { gameStatusList: result };
     }
   },
   startGame: async function (roomId, userId) {
@@ -732,7 +758,7 @@ module.exports = {
             isAdd: true,
           },
         ];
-        await this.updateGoods(userId, updateData);
+        await this.updateGoods(userId, roomId, updateData);
         return true;
       } else {
         return false;
