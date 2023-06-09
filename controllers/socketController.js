@@ -905,6 +905,7 @@ module.exports = function (io) {
 
       roomId = data.roomId;
       let i = 0;
+      let skipResult = [];
       for (let obj of data.userId) {
         try {
           let userId = obj.userId;
@@ -922,16 +923,17 @@ module.exports = function (io) {
               userId,
               roomId
             );
-            io.sockets.emit('skipGame', {
-              updatedPlayer: updatedPlayer,
-              skipRound: data.skipRound,
-            });
+            skipResult.push(updatedPlayer);
           }
         } catch (err) {
           console.log(err);
           io.sockets.emit('skipGame', errResponse(baseResponse.SERVER_ERROR));
         }
       }
+      io.sockets.emit('skipGame', {
+        updatedPlayer: skipResult,
+        skipRound: data.skipRound,
+      });
     }
 
     async function accumulateGoods(data) {
