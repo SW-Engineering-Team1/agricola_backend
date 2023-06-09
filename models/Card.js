@@ -118,6 +118,30 @@ module.exports = (sequelize, DataTypes) => {
       ],
       cardScore: 0,
     },
+    {
+      cardName: 'Small farmer',
+      cardKind: 'Job',
+      cardCost: [],
+      cardScore: 0,
+    },
+    {
+      cardName: 'Counselor',
+      cardKind: 'Job',
+      cardCost: [],
+      cardScore: 0,
+    },
+    {
+      cardName: 'Property manager',
+      cardKind: 'Job',
+      cardCost: [],
+      cardScore: 0,
+    },
+    {
+      cardName: 'Palanquinist',
+      cardKind: 'Job',
+      cardCost: [],
+      cardScore: 0,
+    },
   ];
 
   Card.sync({ force: true }).then(() => {
