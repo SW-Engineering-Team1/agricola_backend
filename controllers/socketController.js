@@ -885,7 +885,10 @@ module.exports = function (io) {
               userId,
               roomId
             );
-            io.sockets.emit('skipGame', updatedPlayer);
+            io.sockets.emit('skipGame', {
+              updatedPlayer: updatedPlayer,
+              skipRound: data.skipRound,
+            });
           }
         } catch (err) {
           console.log(err);
