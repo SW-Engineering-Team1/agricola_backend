@@ -232,7 +232,9 @@ module.exports = function (io) {
           let updatedFacilityList = await gameService.getMainFacilityCards(
             data.roomId
           );
-          io.sockets.emit('useActionSpace', updatedFacilityList);
+          io.sockets.emit('useActionSpace', baseResponse.SUCCESS, {
+            updatedFacilityList,
+          });
 
           // 주요설비를 사용한 플레이어의 상태 emit 필요
           let updatedPlayer = await gameService.getPlayerStatus(

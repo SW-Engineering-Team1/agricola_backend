@@ -277,9 +277,11 @@ module.exports = {
       });
       let remainedMainFacilityCard =
         findGameRoomResult.dataValues.remainedMainFacilityCard;
-      playerDetail['remainedMainFacilityCard'] = remainedMainFacilityCard;
 
-      return playerDetail;
+      return {
+        playerDetail: playerDetail,
+        remainedMainFacilityCard: remainedMainFacilityCard,
+      };
     } catch (err) {
       console.log(err);
       return errResponse(baseResponse.DB_ERROR);
