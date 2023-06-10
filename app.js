@@ -7,7 +7,6 @@ const io = require('socket.io')(http, { cors: { origin: '*' } });
 const socketController = require('./controllers/socketController')(io);
 
 var userRouter = require('./routes/userRoute');
-var roomRouter = require('./routes/roomRoute');
 
 require('./models/index');
 
@@ -26,7 +25,6 @@ app.use(express.urlencoded({ extended: false }));
 app.use(morgan('dev'));
 
 app.use('/user', userRouter);
-app.use('/room', roomRouter);
 
 http.listen(app.get('port'), () => {
   console.log(app.get('port'), '번 포트에서 대기 중');
