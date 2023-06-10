@@ -26,6 +26,11 @@ module.exports = function (io) {
     socket.on('endGame', endGame);
     socket.on('skipGame', skipGame);
     socket.on('accumulateGoods', accumulateGoods);
+    socket.on('transformData', transformData);
+
+    async function transformData(data) {
+      socket.emit('transformData', data);
+    }
 
     async function useFacility(data) {
       let userId = data.userId;
