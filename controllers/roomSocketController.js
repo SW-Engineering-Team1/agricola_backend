@@ -11,6 +11,17 @@ module.exports = function (io) {
     socket.on('joinRoom', joinRoom);
     socket.on('exitRoom', exitRoom);
     socket.on('startGame', startGame);
+    socket.on('getRooms', getRooms);
+
+    async function getRooms() {
+      try {
+        let updatedRooms = await roomService.getRooms();
+        io.sockets.emit('updatedRooms', updatedRooms);
+      } catch (err) {
+        console.log(err);
+        io.sockets.emit('getRooms', errResponse(baseResponse.SERVER_ERROR));
+      }
+    }
 
     async function startGame(data) {
       // data 형식
