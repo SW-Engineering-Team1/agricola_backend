@@ -4,7 +4,11 @@ const morgan = require('morgan');
 const cors = require('cors');
 const http = require('http').Server(app);
 const io = require('socket.io')(http, { cors: { origin: '*' } });
-const socketController = require('./controllers/socketController')(io);
+const roomSocketController = require('./controllers/roomSocketController')(io);
+const gameSocketController = require('./controllers/gameSocketController')(io);
+const actionSocketController = require('./controllers/actionSocketController')(
+  io
+);
 
 var userRouter = require('./routes/userRoute');
 var roomRouter = require('./routes/roomRoute');
