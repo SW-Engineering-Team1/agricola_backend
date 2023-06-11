@@ -221,7 +221,11 @@ module.exports = function (io) {
       }
       // 빵 굽기 이벤트
       else if (data.actionName === 'Bake Bread') {
-        let updateResult = await utilities.bakeBread(data.userId, data.goods);
+        let updateResult = await utilities.bakeBread(
+          data.userId,
+          data.roomId,
+          data.goods
+        );
         io.sockets.emit('useActionSpace', updateResult);
       }
       //회합 장소 이벤트
