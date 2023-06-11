@@ -662,8 +662,7 @@ module.exports = {
         roomId,
       },
     });
-
-    gamestatus.forEach(async (element) => {
+    for (let element of gamestatus) {
       if (element.dataValues.UserId === userId) {
         await GameStatus.update(
           {
@@ -677,6 +676,7 @@ module.exports = {
           }
         );
       } else {
+        console.log(element.dataValues.UserId);
         await GameStatus.update(
           {
             isMyTurn: true,
@@ -689,7 +689,35 @@ module.exports = {
           }
         );
       }
-    });
+    }
+
+    // gamestatus.forEach(async (element) => {
+    //   if (element.dataValues.UserId === userId) {
+    //     await GameStatus.update(
+    //       {
+    //         isMyTurn: false,
+    //       },
+    //       {
+    //         where: {
+    //           roomId,
+    //           UserId: userId,
+    //         },
+    //       }
+    //     );
+    //   } else {
+    //     await GameStatus.update(
+    //       {
+    //         isMyTurn: true,
+    //       },
+    //       {
+    //         where: {
+    //           roomId,
+    //           UserId: element.dataValues.UserId,
+    //         },
+    //       }
+    //     );
+    //   }
+    // });
 
     try {
       let gamestatus = await GameStatus.findAll({
