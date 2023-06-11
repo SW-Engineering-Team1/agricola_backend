@@ -52,13 +52,13 @@ module.exports = {
     return updateResult;
   },
 
-  bakeBread: async function (userId, goodsList) {
+  bakeBread: async function (userId, roomId, goodsList) {
     let findUsedMainFacilityResult = await gameService.findUsedMainFacility(
       userId
     );
     goodsList[0].name = goodsList[0].name + 'OnStorage';
 
-    if (findUsedMainFacilityResult.includes('Stove')) {
+    if (findUsedMainFacilityResult.includes('Stove1')) {
       goodsList = [
         goodsList[0],
         {
@@ -79,7 +79,7 @@ module.exports = {
     } else {
       return baseResponse.BAD_REQUEST;
     }
-    let updateResult = await gameService.updateGoods(userId, goodsList);
+    let updateResult = await gameService.updateGoods(userId, roomId, goodsList);
     if (updateResult.isSuccess == false) {
       return updateResult;
     }
