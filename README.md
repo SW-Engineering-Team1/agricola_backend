@@ -29,8 +29,7 @@
   <img src="https://img.shields.io/badge/kakaotalk-FFCD00?style=for-the-badge&logo=kakaotalk&logoColor=black">
 </p>
 
-![screenshot]("![agricola](https://github.com/SW-Engineering-Team1/agricola_backend/assets/74089849/81d99d23-c7d9-4222-a642-1a8ad08c54ac)
-")
+![agricola](https://github.com/SW-Engineering-Team1/agricola_backend/assets/74089849/81d99d23-c7d9-4222-a642-1a8ad08c54ac)
 
 <hr>
 
