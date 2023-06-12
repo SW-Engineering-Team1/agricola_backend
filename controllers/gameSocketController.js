@@ -23,7 +23,7 @@ module.exports = function (io) {
         // 작물 수확
         let result = await gameService.harvestCrop(userIdList, roomId);
         if (result.isSuccess === false) {
-          io.sockets.emit('endCycle', result);
+          io.sockets.emit('endCycleHarvestCrop', result);
           return;
         }
         io.sockets.emit(
@@ -47,7 +47,7 @@ module.exports = function (io) {
         //음식 지불
         let result = await gameService.payFood(userIdList, roomId);
         if (result.isSuccess === false) {
-          io.sockets.emit('endCycle', result);
+          io.sockets.emit('endCyclePayFood', result);
           return;
         }
         io.sockets.emit(
@@ -71,7 +71,7 @@ module.exports = function (io) {
         //음식 지불
         let result = await gameService.breedAnimal(userIdList, roomId);
         if (result.isSuccess === false) {
-          io.sockets.emit('endCycle', result);
+          io.sockets.emit('endCycleBreedAnimal', result);
           return;
         }
         io.sockets.emit(
