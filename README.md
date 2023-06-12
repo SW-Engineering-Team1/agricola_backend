@@ -97,29 +97,24 @@
 
 ## How To Start
 
-> **Prerequiste:** _installation of node_ and have _mysql database access information_
+> **Prerequiste:**
+>
+> 1. _installation of node_, the versions must be 16 or later for reliable execution
+> 2. Two files below should be located in the certain location
+>
+> - **.env**: In the top level, same level with _.gitignore_ file
+> - **secretKey.js**: Under the _config_ folder, same level with _config.js_ file <br>
+>
+> **You can get the files on our notion page!** https://www.notion.so/2c5644b064b14677bbedb58f07341afe?pvs=4
+
+> **※WARNNING※**: If there is a database connection error when running this project, there may be problem with Wi-Fi. Change the Wi-Fi.
 
 ```bash
-# Make database access information file at the top of project
-[ .env ]
-MYSQL_USERNAME= ${user name}
-MYSQL_PASSWORD= ${userpassword}
-MYSQL_DATABASE= ${database name}
-MYSQL_HOST= ${address of database}
-MYSQL_PORT= ${port of database}
-
-var dotenv = require('dotenv')
-
-dotenv.config()
-
-
-
 # Install dependencies required to run project
 $ npm install
 
 # Run the app
 $ node app.js
-
 ```
 
 ## Contributor
