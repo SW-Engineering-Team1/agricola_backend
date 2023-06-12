@@ -737,7 +737,7 @@ module.exports = {
       return baseResponse.DB_ERROR;
     }
   },
-  usedJobCard: async function (userId, cardName) {
+  usedJobCard: async function (userId, roomId, cardName) {
     try {
       let findResult = await GameStatus.findOne({
         where: { userId },
