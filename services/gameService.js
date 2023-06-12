@@ -691,38 +691,10 @@ module.exports = {
       }
     }
 
-    // gamestatus.forEach(async (element) => {
-    //   if (element.dataValues.UserId === userId) {
-    //     await GameStatus.update(
-    //       {
-    //         isMyTurn: false,
-    //       },
-    //       {
-    //         where: {
-    //           roomId,
-    //           UserId: userId,
-    //         },
-    //       }
-    //     );
-    //   } else {
-    //     await GameStatus.update(
-    //       {
-    //         isMyTurn: true,
-    //       },
-    //       {
-    //         where: {
-    //           roomId,
-    //           UserId: element.dataValues.UserId,
-    //         },
-    //       }
-    //     );
-    //   }
-    // });
-
     try {
       let gamestatus = await GameStatus.findAll({
         where: {
-          roomId,
+          UserId: userId,
         },
       });
       return response(baseResponse.SUCCESS, gamestatus);
