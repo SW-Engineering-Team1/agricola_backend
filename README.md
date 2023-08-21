@@ -121,7 +121,7 @@ $ node app.js
 
 |     | name       | main task         | github address                    | contact             |
 | --- | ---------- | ----------------- | --------------------------------- | ------------------- |
-|     | Gayeon Bae | Backend Developer | https://github.com/BaeGayeon      | gying09@gmail.com   |
+|     | Gayeon Bae | Backend Developer | https://github.com/BaeGayeon      | ebgy918@gmail.com   |
 |     | Minjae Kim | Backend Developer | https://github.com/Minjae-vincent | alswo9853@gmail.com |
 |     |            |                   |                                   |                     |
 
